@@ -1,44 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-public sealed partial class WorldObject : MonoBehaviour
+public class WorldObject : MonoBehaviour
 {
-    [SerializeField] string ingameName = "object";
+    [SerializeField] float visibility = 1f;
+    [SerializeField] float loudness = 0f;
+    [SerializeField] float smelliness = 0f;
 
-    static ulong typeId = 0;
+    public float Visibility => visibility;
+    public float Loudness => loudness;
+    public float Smelliness => smelliness;
 
-    public ulong InstanceId { get; private set; }
-    public ulong TypeId => typeId;
+    public List<Trait> Traits { get; private set; }
 
-    public string Name => ingameName;
-
-    public Dictionary<uint, Trait> Traits { get; } = new Dictionary<uint, Trait>();
-
-    void Awake()
+    void Start()
     {
-        InstanceId = WorldDatabase.Get.AddWithKey(this);
-        if(typeId == 0)
-            typeId = IdGeneration.Djb2(ingameName);
-        var traitList = GetComponents<Trait>();
-        foreach (var trait in traitList)
-            Traits.Add(trait.TraitId, trait);
-    }
-
-    public bool HasTrait(uint traitId) => Traits.ContainsKey(traitId);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="result"></param>
-    /// <returns></returns>
-    public Trait GetTrait(uint traitId)
-    {
-        if(Traits.TryGetValue(traitId, out Trait trait))
-        {
-            return trait;
-        }
-        return null;
+        Traits = new List<Trait>(GetComponents<Trait>());
     }
 }
