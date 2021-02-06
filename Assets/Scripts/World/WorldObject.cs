@@ -13,7 +13,7 @@ public sealed partial class WorldObject : MonoBehaviour
 
     public string Name => ingameName;
 
-    public Dictionary<Type, Trait> Traits { get; } = new Dictionary<Type, Trait>();
+    public Dictionary<uint, Trait> Traits { get; } = new Dictionary<uint, Trait>();
 
     void Awake()
     {
@@ -22,10 +22,10 @@ public sealed partial class WorldObject : MonoBehaviour
             typeId = IdGeneration.Djb2(ingameName);
         var traitList = GetComponents<Trait>();
         foreach (var trait in traitList)
-            Traits.Add(trait.GetType(), trait);
+            Traits.Add(trait.TraitId, trait);
     }
 
-    public bool HasTrait<T>() where T : Trait => Traits.ContainsKey(typeof(T));
+    public bool HasTrait(uint traitId) => Traits.ContainsKey(traitId);
 
     /// <summary>
     /// 
@@ -33,14 +33,12 @@ public sealed partial class WorldObject : MonoBehaviour
     /// <typeparam name="T"></typeparam>
     /// <param name="result"></param>
     /// <returns></returns>
-    public bool HasTrait<T>(out T result) where T : Trait
+    public Trait GetTrait(uint traitId)
     {
-        result = default;
-        if(Traits.TryGetValue(typeof(T), out Trait trait))
+        if(Traits.TryGetValue(traitId, out Trait trait))
         {
-            result = trait as T;
-            return true;
+            return trait;
         }
-        return false;
+        return null;
     }
 }
