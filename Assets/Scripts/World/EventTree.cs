@@ -15,7 +15,7 @@ public class EventTree : KeyedCollection<EventType, PetEvent>
 
     protected override EventType GetKeyForItem(PetEvent item)
     {
-        throw new NotImplementedException();
+        return item.EventType;
     }
 }
 
@@ -61,6 +61,7 @@ public class PetEvent
 
     public PetEvent(EventType eventType)
     {
+        traits = new Dictionary<Type, HashSet<Trait>>();
         EventType = eventType;
     }
 }
