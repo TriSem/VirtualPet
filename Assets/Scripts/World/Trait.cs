@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using System;
 
 [RequireComponent(typeof(WorldObject))]
-public class Trait : MonoBehaviour
+public abstract class Trait : MonoBehaviour
 {
     public WorldObject AssociatedObject { get; protected set; } = default;
-    public int TraitId { get; protected set; } = 0;
+
+    public uint TraitId { get; }
 }
