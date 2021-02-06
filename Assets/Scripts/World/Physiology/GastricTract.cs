@@ -11,7 +11,7 @@ public class GastricTract : MonoBehaviour
     float stomachContent = 0;
     bool throwingUp = false;
     bool eating = false;
-    Food foodSource = null;
+    Food food = null;
 
     public float FillRatio => stomachContent / stomachVolume;
     public float DesiredFillRatio => desiredFillRatio;
@@ -28,22 +28,13 @@ public class GastricTract : MonoBehaviour
         else if(eating)
         {
             float bite = foodIntakeRate * Time.deltaTime;
-            if(foodSource.Content > bite)
-            {
-                foodSource.Content -= bite;
-                AddContent(bite);
-            }
-            else
-            {
-                AddContent(foodSource.Content);
-                foodSource.Content = 0;
-            }
+            AddContent(food.Consume(bite));
         }
     }
 
     public void Eat(Food food)
     {
-        foodSource = food;
+        this.food = food;
         eating = true;
     }
 
