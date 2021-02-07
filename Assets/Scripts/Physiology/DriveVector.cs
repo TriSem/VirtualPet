@@ -16,10 +16,10 @@ public class DriveVector
         }
     }
 
-    float CalculateUtility(List<DriveValue> driveValues)
+    public float CalculateUtility(List<Outcome> outcomes)
     {
         float utility = 0f;
-        foreach(var driveValue in driveValues)
+        foreach(var driveValue in outcomes)
         {
             float value = drives[driveValue.Drive];
             utility += value * driveValue.value;
@@ -27,14 +27,14 @@ public class DriveVector
         return utility;
     }
 
-    void SetValue(Drive drive, float value)
+    public void SetValue(Drive drive, float value)
     {
         drives[drive] = value;
     }
 }
 
 [Serializable]
-public struct DriveValue
+public struct Outcome
 {
     [SerializeField] Drive drive;
     [SerializeField] public float value;
