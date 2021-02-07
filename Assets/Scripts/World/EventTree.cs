@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -17,51 +18,59 @@ public class EventTree : KeyedCollection<EventType, PetEvent>
     {
         return item.EventType;
     }
+
+    public bool EventActive(EventQuery query)
+    {
+        return this[query.EventType].EventActive(query.TraitName);
+    }
 }
 
+[Serializable]
 public class EventQuery
 {
-    public Trait Trait { get; set; }
-    public EventType EventType { get; private set; }
+    [SerializeField] string traitName = "None";
+    [SerializeField] EventType eventType = EventType.None;
+    public string TraitName => traitName;
+    public EventType EventType => eventType;
 
-    public EventQuery(EventType type, Trait trait)
+    public EventQuery(EventType type, string traitName)
     {
-        Trait = trait;
-        EventType = type;
+        eventType = type;
+        this.traitName = traitName;        
     }
 }
 
 public class PetEvent
 {
     public EventType EventType { get; private set; }
-    Dictionary<Type, HashSet<Trait>> traits;
+    Dictionary<string, HashSet<Trait>> traits;
 
     void AddTrait(Trait trait)
     {
-        var type = trait.GetType();
-        if (!traits.ContainsKey(type))
-            traits.Add(type, new HashSet<Trait>());
-        traits[trait.GetType()].Add(trait);
+        var name = trait.GetType().Name;
+        if (!traits.ContainsKey(name))
+            traits.Add(name, new HashSet<Trait>());
+        traits[name].Add(trait);
     }
 
     void RemoveTrait(Trait trait)
     {
-        var type = trait.GetType();
-        if (!traits.ContainsKey(type))
+        var name = trait.GetType().Name;
+        if (!traits.ContainsKey(name))
             return;
-        traits[type].Remove(trait);
+        traits[name].Remove(trait);
     }
 
-    bool ContainsElements<T>(HashSet<Trait> set) where T : Trait
+    public bool EventActive(string traitName)
     {
-        if (traits.TryGetValue(typeof(T), out HashSet<Trait> result))
-            return set.IsSubsetOf(result);
+        if (traits.TryGetValue(traitName, out HashSet<Trait> set))
+            return set.Count > 0;
         return false;
     }
 
     public PetEvent(EventType eventType)
     {
-        traits = new Dictionary<Type, HashSet<Trait>>();
+        traits = new Dictionary<string, HashSet<Trait>>();
         EventType = eventType;
     }
 }
