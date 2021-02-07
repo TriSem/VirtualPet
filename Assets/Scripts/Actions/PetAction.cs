@@ -31,15 +31,19 @@ public abstract class PetAction : MonoBehaviour
         return true;
     }
 
-    protected abstract void Begin();
-    protected abstract void Continue();
-    protected abstract void Stop();
+    /// <summary>
+    /// Empty by default. Select optimal parameters for your action here.
+    /// </summary>
+    public virtual void ChooseOptimalSetup() { }
+
+    public abstract void Begin();
+    public abstract void Continue();
+    public abstract void Stop();
 }
 
 public enum Priority
 {
     Regular,
-    Urgent,
     Reflex
 }
 

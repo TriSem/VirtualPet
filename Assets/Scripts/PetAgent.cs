@@ -7,6 +7,7 @@ public class PetAgent : MonoBehaviour
 {
     [SerializeField] float tickRate = (1 / 10);
     [SerializeField] MotorSystem motorSystem = null;
+    [SerializeField] ActionSelection actionSelection = null;
 
     public NavMeshAgent NavAgent { get; private set; }
     public DriveVector DriveVector { get; } = new DriveVector();
@@ -42,6 +43,7 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
+            actionSelection.StartSelection();
         }
     }
 
