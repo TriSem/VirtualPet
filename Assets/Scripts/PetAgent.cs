@@ -7,27 +7,9 @@ public class PetAgent : MonoBehaviour
 {
     [SerializeField] float tickRate = (1 / 10);
     [SerializeField] MotorSystem motorSystem = null;
-    [SerializeField] ActionSelection actionSelection = null;
 
     public NavMeshAgent NavAgent { get; private set; }
     public DriveVector DriveVector { get; } = new DriveVector();
-
-    EventTree events = new EventTree();
-
-
-    List<Trait> percievedTraits = new List<Trait>();
-
-    public List<T> GetTraits<T>() where T : Trait
-    {
-        var selected = new List<T>();
-        foreach(var trait in percievedTraits)
-        {
-            if (trait is T t)
-                selected.Add(t);
-        }
-
-        return selected;
-    }
 
     float lastTick = (1 / 10);
 
@@ -43,12 +25,6 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
-            actionSelection.StartSelection();
         }
-    }
-
-    public bool EventActive(EventQuery query)
-    {
-        return events.EventActive(query);
     }
 }
