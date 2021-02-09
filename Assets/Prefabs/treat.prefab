@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2425131386482987135}
   - component: {fileID: 5722248869189534453}
   - component: {fileID: 7575444943423209433}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: treat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -113,6 +113,7 @@ MonoBehaviour:
   - drive: 0
     value: -1
   refillable: 0
+  edibleDistance: 1
 --- !u!114 &7575444943423209433
 MonoBehaviour:
   m_ObjectHideFlags: 0
