@@ -79,6 +79,16 @@ public class Perception : MonoBehaviour
             perception.Value.Remove(worldObject);
         }
     }
+
+    public HashSet<WorldObject> GetWorldObjects()
+    {
+        HashSet<WorldObject> worldObjects = new HashSet<WorldObject>();
+        foreach(var element in perceptions)
+        {
+            worldObjects.UnionWith(element.Value);
+        }
+        return worldObjects;
+    }
 }
 
 public enum PerceptionType

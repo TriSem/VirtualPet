@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public class DriveVector
 {
-    Dictionary<Drive, float> drives;
+    Dictionary<Drive, float> drives = new Dictionary<Drive, float>();
 
     public DriveVector()
     {
