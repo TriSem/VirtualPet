@@ -3,18 +3,29 @@ using UnityEngine;
 
 public class WorldObject : MonoBehaviour
 {
+    [SerializeField] string objectName = "Unknown";
     [SerializeField] float visibility = 1f;
-    [SerializeField] float loudness = 0f;
+    [SerializeField] float audibility = 0f;
     [SerializeField] float smelliness = 0f;
 
+    [SerializeField, Tooltip("Mark object to be commited to pets memory.")] 
+    bool isStatic = false;
+
+    /// <summary>
+    /// Determines wether an object will be put into the pets long term
+    /// memory or not.
+    /// </summary>
+    public bool IsStatic => isStatic;
+
+    public string Name => objectName;
     public float Visibility => visibility;
-    public float Loudness => loudness;
+    public float Audibility => audibility;
     public float Smelliness => smelliness;
 
-    public List<Trait> Traits { get; private set; }
+    public List<ActionObject> Actions { get; private set; }
 
     void Start()
     {
-        Traits = new List<Trait>(GetComponents<Trait>());
+        Actions = new List<ActionObject>(GetComponents<ActionObject>());
     }
 }
