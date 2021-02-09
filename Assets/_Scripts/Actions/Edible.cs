@@ -7,7 +7,7 @@ public class Edible : ActionObject
     PetAgent agent = null;
 
     [SerializeField] bool refillable = false;
-    [SerializeField] float edibleDistance = 1f;
+    [SerializeField] Interaction interaction = default;
 
     public override void Cancel()
     {

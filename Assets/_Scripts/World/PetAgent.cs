@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(NavMeshAgent), typeof(ActionSelection))]
 public class PetAgent : MonoBehaviour
 {
     [SerializeField] float tickRate = (1 / 10);
     [SerializeField] MotorSystem motorSystem = null;
-    [SerializeField] Perception perception;
+    [SerializeField] Perception perception = null;
+    ActionSelection actionSelection = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
 
@@ -23,6 +23,7 @@ public class PetAgent : MonoBehaviour
     {
         NavAgent = GetComponent<NavMeshAgent>();
         BoundingBox = GetComponent<BoxCollider>();
+        actionSelection = GetComponent<ActionSelection>();
     }
 
     void Update()
@@ -31,6 +32,7 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
+            actionSelection.SelectAction();
         }
     }
 }

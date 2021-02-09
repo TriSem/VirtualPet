@@ -33,7 +33,7 @@ public class MotorSystem : MonoBehaviour
 
     float DetermineSpeedLimit()
     {
-        float limit = maximumSpeed;
+        float limit = baseSpeed;
         return Mathf.Max(baseSpeed, limit);
     }
 

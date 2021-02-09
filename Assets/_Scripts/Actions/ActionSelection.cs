@@ -3,36 +3,58 @@ using UnityEngine;
 
 public class ActionSelection : MonoBehaviour
 {
-    [SerializeField] PetAgent agent;
-    IAction currentAction = null;
+    [SerializeField] PetAgent agent = default;
+    [SerializeField] Transform reactionSet = default;
+    [SerializeField] ActionObject fallbackBehavior = default;
+
+    List<Reaction> reactions = default;
+    public IAction CurrentAction { get; private set; } = default;
+    public float CurrentUtility { get; private set; } = 0f;
+
+    void Start()
+    {
+        reactions = new List<Reaction>(reactionSet.GetComponents<Reaction>());
+    }
 
     public void SelectAction()
     {
         var reaction = CheckForReactions();
-        if(reaction != null)
+        if (
+            reaction != null &&
+            !(CurrentAction is Reaction))
         {
-            currentAction.Cancel();
-            currentAction = reaction;
-            currentAction.UseAction(agent);
+            CurrentAction.Cancel();
+            CurrentAction = reaction;
+            CurrentAction.UseAction(agent);
+            CurrentUtility = float.MaxValue;
         }
-        else if(currentAction.Status != ActionStatus.Ongoing)
+        else if (CurrentAction == null)
+        {
+            CurrentAction = fallbackBehavior;
+            CurrentUtility = fallbackBehavior.CalculateUtility(agent.DriveVector);
+            CurrentAction.UseAction(agent);
+        }
+        else if (CurrentAction.Status != ActionStatus.Ongoing)
         {
             HashSet<WorldObject> percievedObjects = agent.Perception.GetWorldObjects();
-            ActionObject mostUseful = MostUsefulAction(percievedObjects);
-            currentAction = mostUseful;
-            currentAction.UseAction(agent);
+            ChooseNewAction(percievedObjects);
+            CurrentAction.UseAction(agent);
         }
     }
 
-    public ActionObject CheckForReactions()
+    public IAction CheckForReactions()
     {
-        // TODO: Add support for reactions.
+        foreach(var reaction in reactions)
+        {
+            if (reaction.Triggered)
+                return reaction;
+        }
         return null;
     }
 
-    public ActionObject MostUsefulAction(HashSet<WorldObject> worldObjects)
+    public void ChooseNewAction(HashSet<WorldObject> worldObjects)
     {
-        ActionObject mostUseful = null;
+        ActionObject mostUseful = fallbackBehavior;
         float highestUtility = float.MinValue;
 
         foreach (var worldObject in worldObjects)
@@ -51,6 +73,7 @@ public class ActionSelection : MonoBehaviour
             }
         }
 
-        return mostUseful;
+        CurrentUtility = highestUtility;
+        CurrentAction = mostUseful;
     }
 }

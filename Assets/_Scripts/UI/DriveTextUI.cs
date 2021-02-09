@@ -17,6 +17,6 @@ public class DriveTextUI : MonoBehaviour
 
     void Update()
     {
-        text.text = baseString + agent.DriveVector.GetValue(drive);
+        text.text = baseString + agent.DriveVector.GetValue(drive).ToString("F2");
     }
 }

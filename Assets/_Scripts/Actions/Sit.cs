@@ -5,10 +5,18 @@ public class Sit : Reaction, IAudioReciever
     [SerializeField, Range(0, 100)]
     int learnedAfterRepitition = 10;
 
-    [SerializeField] new BoxCollider collider = null;
+    [SerializeField, Range(1f, 100f)]
+    float minimumSitTime = 1f;
+
+    [SerializeField, Range(1f, 100f)]
+    float maximumSitTime = 5f;
+
+    [SerializeField]
+    new BoxCollider collider = null;
 
     bool learned = false;
     bool learningEnabled = false;
+    float stopSittingTime = 0f;
 
     int reinforcementCount = 0;
 
@@ -48,8 +56,19 @@ public class Sit : Reaction, IAudioReciever
             icon.gameObject.SetActive(true);
         }
 
+        stopSittingTime = Time.time + Random.Range(minimumSitTime, maximumSitTime);
+
         agent.NavAgent.isStopped = true;
         // TODO: Play sitting animation
+    }
+
+    void Update()
+    {
+        if(Status == ActionStatus.Ongoing)
+        {
+            if (Time.time > stopSittingTime)
+                Cancel();
+        }
     }
 
     void OnTriggerEnter(Collider other)
