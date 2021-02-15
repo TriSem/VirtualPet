@@ -6,22 +6,35 @@ public class MotorSystem : MonoBehaviour
     [SerializeField] NavMeshAgent navAgent = null;
     [SerializeField] float baseSpeed = 3f;
     [SerializeField] float maximumSpeed = 6f;
-    [SerializeField] float baseAngularSpeed = 45f;
-    [SerializeField] float maximumAngularSpeed = 90;
+    [SerializeField] float baseAngularSpeed = 135f;
+    [SerializeField] float maximumAngularSpeed = 270f;
+    [SerializeField] float baseStoppingDistance = 2f;
 
-    public MotorState State { get; private set; } = MotorState.STANDING;
-    public ActivityLevel ActivityLevel { get; private set; } = ActivityLevel.RESTING;
+    InteractionCondition interactionCondition;
+    DestinationCondition destinationCondition;
+    ICondition currentCondition;
+
+    public bool Arrived => currentCondition.Met;
+
 
     void Start()
     {
+        navAgent = GetComponent<NavMeshAgent>();
         navAgent.speed = baseSpeed;
         navAgent.angularSpeed = baseAngularSpeed;
+        navAgent.stoppingDistance = baseStoppingDistance;
+        destinationCondition = new DestinationCondition(navAgent);
+        currentCondition = destinationCondition;
     }
 
     void Update()
     {
-        DetermineActivityLevel();
         LimitCurrentSpeed();
+
+        if(Arrived)
+        {
+            navAgent.ResetPath();
+        }
     }
 
     public void RequestSpeed(float speed)
@@ -50,44 +63,25 @@ public class MotorSystem : MonoBehaviour
             / 100;
     }
 
-    void DetermineActivityLevel()
-    {
-        if (State == MotorState.LYING_DOWN || State == MotorState.SITTING)
-            ActivityLevel = ActivityLevel.RESTING;
-        else if (State == MotorState.STANDING)
-            ActivityLevel = ActivityLevel.LIGHT;
-        else
-        {
-            float third = (maximumSpeed - baseSpeed) / 3;
-            if (navAgent.speed < baseSpeed + third)
-                ActivityLevel = ActivityLevel.LIGHT;
-            else if (navAgent.speed < baseSpeed + third * 2)
-                ActivityLevel = ActivityLevel.MODERATE;
-            else
-                ActivityLevel = ActivityLevel.INTENSE;
-        }
-    }
-
     void LimitCurrentSpeed()
     {
         float limit = DetermineSpeedLimit();
         navAgent.speed = Mathf.Min(navAgent.speed, limit);
         AdjustAngularSpeed();   
     }
-}
 
-public enum MotorState
-{
-    LYING_DOWN,
-    SITTING,
-    STANDING,
-    MOVING
-}
+    public void GoInteract(Interaction interaction)
+    {
+        interactionCondition = new InteractionCondition(interaction);
+        navAgent.stoppingDistance = 0.5f;
+        navAgent.destination = interaction.transform.position;
+        currentCondition = interactionCondition;
+    }
 
-public enum ActivityLevel
-{
-    RESTING,
-    LIGHT,
-    MODERATE,
-    INTENSE
+    public void MoveTo(Vector3 position)
+    {
+        navAgent.destination = position;
+        navAgent.stoppingDistance = baseStoppingDistance;
+        currentCondition = destinationCondition;
+    }
 }
