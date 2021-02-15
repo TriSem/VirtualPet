@@ -20,7 +20,7 @@ public class CurrentActionUI : MonoBehaviour
         else
         {
             string currentAction = actionSelection.CurrentAction.ToString();
-            text.text = currentAction + ": " + actionSelection.CurrentUtility.ToString();
+            text.text = currentAction + ": " + actionSelection.CurrentUtility.ToString("F2");
         }
     }
 }
