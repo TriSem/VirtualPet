@@ -12,7 +12,7 @@ public class Sit : Reaction, IAudioReciever
     float maximumSitTime = 5f;
 
     [SerializeField]
-    new BoxCollider collider = null;
+    TagTrigger tagTrigger = null;
 
     bool learned = false;
     bool learningEnabled = false;
@@ -21,6 +21,7 @@ public class Sit : Reaction, IAudioReciever
     int reinforcementCount = 0;
 
     [SerializeField] Transform icon = null;
+    [SerializeField] AudioHub audioHub = null;
 
     public override void Cancel()
     {
@@ -37,13 +38,21 @@ public class Sit : Reaction, IAudioReciever
     public void RecieveSignal(Command command)
     {
         if (learned && command == Command.Sit)
+        {
             Triggered = true;
+            Debug.Log("Sit understood.");
+        }
         if (learningEnabled && command == Command.Sit)
         {
             reinforcementCount++;
             if (reinforcementCount >= learnedAfterRepitition)
                 learned = true;
         }
+    }
+
+    void Start()
+    {
+        audioHub.Register(this);
     }
 
     public override void UseAction(PetAgent agent)
@@ -58,22 +67,18 @@ public class Sit : Reaction, IAudioReciever
 
         stopSittingTime = Time.time + Random.Range(minimumSitTime, maximumSitTime);
 
-        agent.NavAgent.isStopped = true;
         // TODO: Play sitting animation
     }
 
     void Update()
     {
+        if (tagTrigger.Triggered)
+            Triggered = true;
+
         if(Status == ActionStatus.Ongoing)
         {
             if (Time.time > stopSittingTime)
                 Cancel();
         }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Treat"))
-            Triggered = true;
     }
 }
