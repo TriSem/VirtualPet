@@ -209,6 +209,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 905796842272387459, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: baseStoppingDistance
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3221976340868355262, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: motorSystem
       value: 
@@ -217,6 +221,10 @@ PrefabInstance:
       propertyPath: tickRate
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 3221976340868355262, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: stomach
+      value: 
+      objectReference: {fileID: 62655683}
     - target: {fileID: 5130983114704460636, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -287,7 +295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8386001763405940298, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: m_AngularSpeed
-      value: 160
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 8386001763405940298, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: m_Speed
@@ -325,14 +333,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 62655681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aad82479c61f6404399600b261500b63, type: 3}
+  m_Script: {fileID: 11500000, guid: f913594dc43d13248811d28e70dafe17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  learnedAfterRepitition: 10
-  minimumSitTime: 1
-  maximumSitTime: 5
-  collider: {fileID: 895941466}
-  icon: {fileID: 1080981816}
+  maxFill: 100
+  avoidFoodAtFill: 90
+  decayPerSecond: 0.5
+  agent: {fileID: 62655685}
 --- !u!114 &62655684 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3026241946485107329, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
@@ -449,11 +456,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aad82479c61f6404399600b261500b63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  learnedAfterRepitition: 3
+  learnedAfterRepitition: 1
   minimumSitTime: 1
   maximumSitTime: 5
-  collider: {fileID: 895941466}
+  tagTrigger: {fileID: 895941468}
   icon: {fileID: 1080981816}
+  audioHub: {fileID: 11400000, guid: b2c9e8c0075ba234b99e37151041aa6a, type: 2}
 --- !u!1 &215199282
 GameObject:
   m_ObjectHideFlags: 0
@@ -643,7 +651,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 1, z: 20}
+  m_Size: {x: 10, y: 4, z: 20}
   m_Center: {x: 0, y: 0, z: 10}
 --- !u!4 &649573292
 Transform:
@@ -855,6 +863,7 @@ GameObject:
   m_Component:
   - component: {fileID: 895941467}
   - component: {fileID: 895941466}
+  - component: {fileID: 895941468}
   m_Layer: 0
   m_Name: SitTrigger
   m_TagString: Untagged
@@ -889,6 +898,19 @@ Transform:
   m_Father: {fileID: 87276103}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &895941468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 895941465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d91a78b712c57c4a967e0192ee7eb0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tagName: Treat
 --- !u!1 &966129285
 GameObject:
   m_ObjectHideFlags: 0
@@ -2660,7 +2682,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1374100087}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.13599998, z: 1.663}
+  m_LocalPosition: {x: 0, y: 0.13599998, z: 1.124}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1238023241}
@@ -2898,8 +2920,8 @@ Transform:
   m_Father: {fileID: 966129292}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1498639532
-BoxCollider:
+--- !u!135 &1498639532
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2909,8 +2931,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.63, y: 2.55, z: 1}
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1498639533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3093,7 +3115,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh16826
+  m_Name: pb_Mesh17072
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
