@@ -69,6 +69,15 @@ public class ActionSelection : MonoBehaviour
                         mostUseful = action;
                         highestUtility = utility;
                     }
+                    else if(utility == highestUtility)
+                    {
+                        if(Vector3.SqrMagnitude(agent.transform.position - mostUseful.transform.position)
+                            < Vector3.SqrMagnitude(agent.transform.position - action.transform.position))
+                        {
+                            mostUseful = action;
+                            highestUtility = utility;
+                        }
+                    }
                 }
             }
         }
