@@ -7,12 +7,13 @@ public class PetAgent : MonoBehaviour
     [SerializeField] float tickRate = (1 / 10);
     [SerializeField] MotorSystem motorSystem = null;
     [SerializeField] Perception perception = null;
+    [SerializeField] Stomach stomach = null;
     ActionSelection actionSelection = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
 
+    public Stomach Stomach => stomach;
     public Perception Perception => perception;
-    public NavMeshAgent NavAgent { get; private set; }
     public DriveVector DriveVector { get; } = new DriveVector();
     public MotorSystem Motor => motorSystem;
 
@@ -21,7 +22,6 @@ public class PetAgent : MonoBehaviour
 
     void Awake()
     {
-        NavAgent = GetComponent<NavMeshAgent>();
         BoundingBox = GetComponent<BoxCollider>();
         actionSelection = GetComponent<ActionSelection>();
     }
