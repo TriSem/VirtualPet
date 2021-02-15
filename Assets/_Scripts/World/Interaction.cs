@@ -9,7 +9,7 @@ public class Interaction : MonoBehaviour
 
     void Start()
     {
-        GetComponent<Collider>();
+        collider = GetComponent<Collider>();
     }
 
     void OnTriggerEnter(Collider other)
