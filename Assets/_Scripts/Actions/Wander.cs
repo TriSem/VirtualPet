@@ -3,8 +3,8 @@ using UnityEngine.AI;
 
 public class Wander : ActionObject
 {
-    NavMeshAgent navAgent = null;
-    float waitFor = 5f;
+    MotorSystem motor = null;
+    float waitFor = 1f;
     float waitTime = 0f;
 
     public override void Cancel()
@@ -14,11 +14,11 @@ public class Wander : ActionObject
 
     public override void UseAction(PetAgent agent)
     {
-        navAgent = agent.NavAgent;
+        motor = agent.Motor;
         var moveTo = Random.onUnitSphere * Random.Range(1f, 10f) + transform.position;
         if(NavMesh.SamplePosition(moveTo, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
-            navAgent.destination = hit.position;
+            motor.MoveTo(hit.position);
         }
         waitTime = waitFor + Time.time;
         Status = ActionStatus.Ongoing;
@@ -28,7 +28,7 @@ public class Wander : ActionObject
     {
         if (
             Status == ActionStatus.Ongoing && 
-            Vector3.Distance(navAgent.transform.position, navAgent.destination) < navAgent.stoppingDistance &&
+            motor.Arrived &&
             Time.time > waitTime)
             Cancel();
     }
