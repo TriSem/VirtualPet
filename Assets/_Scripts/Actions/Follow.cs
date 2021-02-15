@@ -1,9 +1,6 @@
-﻿using UnityEngine.AI;
-using UnityEngine;
-
-public class Follow : ActionObject
+﻿public class Follow : ActionObject
 {
-    NavMeshAgent navAgent = null;
+    PetAgent agent = null;
 
     public override void Cancel()
     {
@@ -12,7 +9,7 @@ public class Follow : ActionObject
 
     public override void UseAction(PetAgent agent)
     {
-        navAgent = agent.NavAgent;
+        this.agent= agent;
         Status = ActionStatus.Ongoing;
     }
 
@@ -20,13 +17,9 @@ public class Follow : ActionObject
     {
         if (Status == ActionStatus.Ongoing)
         {
-            navAgent.SetDestination(transform.position);
-            if(Vector3.Distance(
-                navAgent.transform.position,
-                transform.position) <= navAgent.stoppingDistance)
-            {
+            agent.Motor.MoveTo(transform.position);
+            if (agent.Motor.Arrived)
                 Cancel();
-            }
         }
     }
 }
