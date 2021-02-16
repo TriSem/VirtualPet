@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ActionSelection : MonoBehaviour
@@ -14,32 +15,64 @@ public class ActionSelection : MonoBehaviour
     void Start()
     {
         reactions = new List<Reaction>(reactionSet.GetComponents<Reaction>());
+        CurrentAction = fallbackBehavior;
     }
 
-    public void SelectAction()
+    public void EvaluateActions()
     {
-        var reaction = CheckForReactions();
-        if (
-            reaction != null &&
-            !(CurrentAction is Reaction))
+        foreach (var reaction in reactions)
         {
-            CurrentAction.Cancel();
-            CurrentAction = reaction;
-            CurrentAction.UseAction(agent);
-            CurrentUtility = float.MaxValue;
+            if (reaction.Triggered)
+            {
+                CurrentAction.Cancel();
+                CurrentAction = reaction;
+                CurrentAction.UseAction(agent);
+                CurrentUtility = float.MaxValue;
+                return;
+            }
         }
-        else if (CurrentAction == null)
+
+        var worldObjects = agent.Perception.GetWorldObjects();
+        var actions = new List<ActionObject>();
+        foreach (var worldObject in worldObjects)
+        {
+            actions.AddRange(worldObject.Actions);
+        }
+
+        if(actions.Count == 0)
         {
             CurrentAction = fallbackBehavior;
-            CurrentUtility = fallbackBehavior.CalculateUtility(agent.DriveVector);
             CurrentAction.UseAction(agent);
+            return;
         }
-        else if (CurrentAction.Status != ActionStatus.Ongoing)
+
+        var actionUtility = new List<Tuple<float, ActionObject>>();
+        foreach (var action in actions)
         {
-            HashSet<WorldObject> percievedObjects = agent.Perception.GetWorldObjects();
-            ChooseNewAction(percievedObjects);
-            CurrentAction.UseAction(agent);
+            float utility = action.CalculateUtility(agent.DriveVector);
+            actionUtility.Add(new Tuple<float, ActionObject>(utility, action));
         }
+
+        actionUtility.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+        float highestUtility = actionUtility[0].Item1;
+
+        if(CurrentAction.Status == ActionStatus.Ongoing && highestUtility <= CurrentUtility)
+        {
+            return;
+        }
+
+        if(CurrentAction.Status == ActionStatus.Inactive)
+        {
+            CullBelowUtility(highestUtility * 0.9f, actionUtility);
+        }
+        else
+        {
+            CullBelowUtility(CurrentUtility, actionUtility);
+        }
+
+        int index = UnityEngine.Random.Range(0, actionUtility.Count - 1);
+        CurrentAction = actionUtility[index].Item2;
+        CurrentAction.UseAction(agent);
     }
 
     public IAction CheckForReactions()
@@ -52,37 +85,12 @@ public class ActionSelection : MonoBehaviour
         return null;
     }
 
-    public void ChooseNewAction(HashSet<WorldObject> worldObjects)
+    public void CullBelowUtility(float utilityThreshold, List<Tuple<float, ActionObject>> actionUtility)
     {
-        ActionObject mostUseful = fallbackBehavior;
-        float highestUtility = float.MinValue;
-
-        foreach (var worldObject in worldObjects)
+        for (int i = actionUtility.Count - 1; i > 0; i--)
         {
-            foreach (var action in worldObject.Actions)
-            {
-                if (action.IsUsable())
-                {
-                    float utility = action.CalculateUtility(agent.DriveVector);
-                    if (utility > highestUtility)
-                    {
-                        mostUseful = action;
-                        highestUtility = utility;
-                    }
-                    else if(utility == highestUtility)
-                    {
-                        if(Vector3.SqrMagnitude(agent.transform.position - mostUseful.transform.position)
-                            < Vector3.SqrMagnitude(agent.transform.position - action.transform.position))
-                        {
-                            mostUseful = action;
-                            highestUtility = utility;
-                        }
-                    }
-                }
-            }
+            if (actionUtility[i].Item1 < utilityThreshold)
+                actionUtility.RemoveAt(i);
         }
-
-        CurrentUtility = highestUtility;
-        CurrentAction = mostUseful;
     }
 }
