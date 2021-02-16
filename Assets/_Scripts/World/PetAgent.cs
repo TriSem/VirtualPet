@@ -32,7 +32,7 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
-            actionSelection.SelectAction();
+            actionSelection.EvaluateActions();
         }
     }
 }
