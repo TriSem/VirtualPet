@@ -39,7 +39,7 @@ public class ActionSelection : MonoBehaviour
             actions.AddRange(worldObject.Actions);
         }
 
-        if(actions.Count == 0)
+        if(actions.Count == 0 || CurrentAction == null)
         {
             CurrentAction = fallbackBehavior;
             CurrentAction.UseAction(agent);
