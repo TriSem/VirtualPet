@@ -81,4 +81,9 @@ public class Sit : Reaction, IAudioReciever
                 Cancel();
         }
     }
+
+    public override bool CanDoBoth(IAction other)
+    {
+        return false;
+    }
 }
