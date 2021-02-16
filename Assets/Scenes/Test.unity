@@ -213,6 +213,14 @@ PrefabInstance:
       propertyPath: baseStoppingDistance
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 905796842272387459, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: baseAngularSpeed
+      value: 135
+      objectReference: {fileID: 0}
+    - target: {fileID: 905796842272387459, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: maximumAngularSpeed
+      value: 270
+      objectReference: {fileID: 0}
     - target: {fileID: 3221976340868355262, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: motorSystem
       value: 
