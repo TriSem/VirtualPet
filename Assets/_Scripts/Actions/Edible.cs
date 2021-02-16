@@ -26,7 +26,8 @@ public class Edible : ActionObject
     {
         agent.Stomach.ChangeFill(fillValue);
         Cancel();
-        gameObject.transform.position = new Vector3(1000, 1000, 1000);
+        agent.Motor.Stop();
+        Destroy(gameObject);
     }
 
     void Update()
