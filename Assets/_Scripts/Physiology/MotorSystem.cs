@@ -84,4 +84,10 @@ public class MotorSystem : MonoBehaviour
         navAgent.stoppingDistance = baseStoppingDistance;
         currentCondition = destinationCondition;
     }
+
+    public void Stop()
+    {
+        navAgent.ResetPath();
+        currentCondition = destinationCondition;
+    }
 }
