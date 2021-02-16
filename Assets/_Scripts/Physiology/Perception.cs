@@ -26,26 +26,7 @@ public class Perception : MonoBehaviour
 
     void Update()
     {
-        var visuals = perceptions[PerceptionType.Visual];
-        foreach (var worldObject in visuals)
-        {
-            if(worldObject.Visibility < visiblityThreshold)
-                visuals.Remove(worldObject);
-        }
-
-        var audibles = perceptions[PerceptionType.Audio];
-        foreach (var worldObject in audibles)
-        {
-            if (worldObject.Audibility < audibilityThreshold)
-                audibles.Remove(worldObject);
-        }
-
-        var smells = perceptions[PerceptionType.Smell];
-        foreach (var worldObject in smells)
-        {
-            if (worldObject.Smelliness < smellThreshold)
-                smells.Remove(worldObject);
-        }
+        TrimDeletedObjects();
     }
 
     public void Add(PerceptionType type, WorldObject worldObject)
@@ -88,6 +69,18 @@ public class Perception : MonoBehaviour
             worldObjects.UnionWith(element.Value);
         }
         return worldObjects;
+    }
+
+    void TrimDeletedObjects()
+    {
+        HashSet<WorldObject> deletedObjects = new HashSet<WorldObject>();
+        foreach(var visual in perceptions[PerceptionType.Visual])
+        {
+            if (visual == null)
+                deletedObjects.Add(visual);
+        }
+
+        perceptions[PerceptionType.Visual].ExceptWith(deletedObjects);
     }
 }
 
