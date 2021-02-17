@@ -4,11 +4,11 @@
 public class PlayerControl : MonoBehaviour
 {
     [SerializeField] float walkSpeed = 3f;
-    [SerializeField] float turningSpeed = 20f;
-    [SerializeField] Camera playerCamera = default;
-    [SerializeField] Transform cursor = default;
+    [SerializeField] Transform neck = default;
+    [SerializeField] Transform playerCamera = default;
 
-    Vector3 velocity = Vector3.zero;
+    Vector3 velocity = default;
+    Vector3 neckPosition = default;
     float currentCameraPitch;
     CharacterController characterController;
 
@@ -17,6 +17,7 @@ public class PlayerControl : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         characterController = GetComponent<CharacterController>();
+        neckPosition = neck.transform.localPosition;
     }
 
     void Update()
@@ -26,21 +27,16 @@ public class PlayerControl : MonoBehaviour
 
     void ProcessInput()
     {
-        TurnCharacter();
+        var lookDirection = playerCamera.forward;
+        lookDirection.y = 0;
+        transform.forward = lookDirection;
         MoveCharacter();
-        cursor.transform.position = playerCamera.transform.forward + playerCamera.transform.position;
-    }
-
-    void TurnCharacter()
-    {
-        var scaledSpeed = turningSpeed * Time.deltaTime;
-        var pitchDelta = -Input.GetAxis("Mouse Y") * scaledSpeed;
-        var yawDelta = Input.GetAxis("Mouse X") * scaledSpeed;
-        currentCameraPitch += pitchDelta;
-        currentCameraPitch = Mathf.Clamp(currentCameraPitch, -80f, 80f);
-        playerCamera.transform.localEulerAngles = Vector3.right * currentCameraPitch;
-        transform.localEulerAngles += Vector3.up * yawDelta;
-
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            Crouch();
+        }
+        else
+            neck.localPosition = neckPosition;
     }
 
     void MoveCharacter()
@@ -57,5 +53,10 @@ public class PlayerControl : MonoBehaviour
             velocity.y = oldY + (-9.8f) * Time.deltaTime;
 
         characterController.Move(velocity * Time.deltaTime);
+    }
+
+    void Crouch()
+    {
+        neck.transform.localPosition = neckPosition + new Vector3(0, -0.5f, 0);
     }
 }
