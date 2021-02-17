@@ -71,6 +71,7 @@ public class ActionSelection : MonoBehaviour
         }
 
         int index = UnityEngine.Random.Range(0, actionUtility.Count - 1);
+        CurrentUtility = actionUtility[index].Item1;
         CurrentAction = actionUtility[index].Item2;
         CurrentAction.UseAction(agent);
     }
