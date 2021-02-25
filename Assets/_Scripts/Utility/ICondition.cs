@@ -1,11 +1,51 @@
 ﻿using UnityEngine.AI;
 
-interface ICondition
+public interface ICondition
 {
     bool Met { get; }
 }
 
-class DestinationCondition : ICondition
+public class AndCondition : ICondition
+{
+    ICondition condition1, condition2;
+
+    public AndCondition(ICondition condition1, ICondition condition2)
+    {
+        this.condition1 = condition1;
+        this.condition2 = condition2;
+    }
+
+    public bool Met => condition1.Met && condition2.Met;
+}
+
+public class OrCondition : ICondition
+{
+    ICondition condition1, condition2;
+
+    public OrCondition(ICondition condition1, ICondition condition2)
+    {
+        this.condition1 = condition1;
+        this.condition2 = condition2;
+    }
+
+
+    public bool Met => condition1.Met || condition2.Met;
+}
+
+public class NotCondition : ICondition
+{
+    ICondition condition;
+
+    public NotCondition(ICondition condition)
+    {
+        this.condition = condition;
+    }
+
+    public bool Met => !condition.Met;
+}
+
+
+public class DestinationCondition : ICondition
 {
     NavMeshAgent agent;
 
