@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionSelection : MonoBehaviour
+public class BehaviourSelection : MonoBehaviour
 {
     [SerializeField] PetAgent agent = default;
     [SerializeField] Transform reactionSet = default;
     [SerializeField] ActionObject fallbackBehavior = default;
 
     List<Reaction> reactions = default;
-    public IAction CurrentAction { get; private set; } = default;
+    public IBehaviour CurrentAction { get; private set; } = default;
     public float CurrentUtility { get; private set; } = 0f;
 
     void Start()
@@ -26,7 +26,7 @@ public class ActionSelection : MonoBehaviour
             {
                 CurrentAction.Cancel();
                 CurrentAction = reaction;
-                CurrentAction.UseAction(agent);
+                CurrentAction.Use(agent);
                 CurrentUtility = float.MaxValue;
                 return;
             }
@@ -39,18 +39,21 @@ public class ActionSelection : MonoBehaviour
             actions.AddRange(worldObject.Actions);
         }
 
-        if(actions.Count == 0 || CurrentAction == null)
-        {
-            CurrentAction = fallbackBehavior;
-            CurrentAction.UseAction(agent);
-            return;
-        }
-
         var actionUtility = new List<Tuple<float, ActionObject>>();
         foreach (var action in actions)
         {
-            float utility = action.CalculateUtility(agent.DriveVector);
-            actionUtility.Add(new Tuple<float, ActionObject>(utility, action));
+            if(action.IsUsable())
+            {
+                float utility = action.CalculateUtility(agent.DriveVector);
+                actionUtility.Add(new Tuple<float, ActionObject>(utility, action));
+            }
+        }
+
+        if (actionUtility.Count == 0 || CurrentAction == null)
+        {
+            CurrentAction = fallbackBehavior;
+            CurrentAction.Use(agent);
+            return;
         }
 
         actionUtility.Sort((x, y) => y.Item1.CompareTo(x.Item1));
@@ -73,10 +76,10 @@ public class ActionSelection : MonoBehaviour
         int index = UnityEngine.Random.Range(0, actionUtility.Count - 1);
         CurrentUtility = actionUtility[index].Item1;
         CurrentAction = actionUtility[index].Item2;
-        CurrentAction.UseAction(agent);
+        CurrentAction.Use(agent);
     }
 
-    public IAction CheckForReactions()
+    public IBehaviour CheckForReactions()
     {
         foreach(var reaction in reactions)
         {

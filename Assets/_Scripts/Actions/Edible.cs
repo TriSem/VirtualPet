@@ -15,10 +15,9 @@ public class Edible : ActionObject
         Status = ActionStatus.Inactive;
     }
 
-    public override void UseAction(PetAgent agent)
+    public override void Use(PetAgent agent)
     {
         this.agent = agent;
-        agent.Motor.GoInteract(interaction);
         Status = ActionStatus.Ongoing;
     }
 

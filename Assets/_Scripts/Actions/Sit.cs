@@ -55,7 +55,7 @@ public class Sit : Reaction, IAudioReciever
         audioHub.Register(this);
     }
 
-    public override void UseAction(PetAgent agent)
+    public override void Use(PetAgent agent)
     {
         Triggered = false;
         Status = ActionStatus.Ongoing;
@@ -82,7 +82,7 @@ public class Sit : Reaction, IAudioReciever
         }
     }
 
-    public override bool CanDoBoth(IAction other)
+    public override bool CanDoBoth(IBehaviour other)
     {
         return false;
     }

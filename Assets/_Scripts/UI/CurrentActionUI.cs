@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CurrentActionUI : MonoBehaviour
 {
-    [SerializeField] ActionSelection actionSelection = default;
+    [SerializeField] BehaviourSelection actionSelection = default;
     Text text = default;
 
     void Start()

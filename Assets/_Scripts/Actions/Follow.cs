@@ -7,7 +7,7 @@
         Status = ActionStatus.Inactive;
     }
 
-    public override void UseAction(PetAgent agent)
+    public override void Use(PetAgent agent)
     {
         this.agent= agent;
         Status = ActionStatus.Ongoing;
@@ -17,9 +17,6 @@
     {
         if (Status == ActionStatus.Ongoing)
         {
-            agent.Motor.MoveTo(transform.position);
-            if (agent.Motor.Arrived)
-                Cancel();
         }
     }
 }

@@ -9,7 +9,7 @@ public class SleepingPlace : ActionObject
         throw new System.NotImplementedException();
     }
 
-    public override void UseAction(PetAgent agent)
+    public override void Use(PetAgent agent)
     {
     }
 

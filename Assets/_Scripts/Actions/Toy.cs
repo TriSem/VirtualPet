@@ -12,7 +12,7 @@ public class Toy : ActionObject
     {
     }
 
-    public override void UseAction(PetAgent agent)
+    public override void Use(PetAgent agent)
     {
         Status = ActionStatus.Ongoing;
         Pursue();
