@@ -23,18 +23,19 @@ public abstract class ActionObject : MonoBehaviour, IAction
     }
 
     public abstract void UseAction(PetAgent agent);
+
     public abstract void Cancel();
 
     public bool CanDoBoth(IAction other)
     {
         return false;
     }
+
+    public virtual bool Interruptible() => true;
 }
 
 public enum ActionStatus
 {
     Inactive,
     Ongoing,
-    Success,
-    Cancelled
 }
