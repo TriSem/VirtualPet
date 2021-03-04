@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,11 +7,14 @@ public class PetStateMachine
     PetState initialState;
     PetState currentState;
 
-    PetState exitState;
-
     public void Start()
     {
         currentState = initialState;
+    }
+
+    public void Stop()
+    {
+        currentState.OnExit();
     }
 
     public void Update()
@@ -23,28 +26,28 @@ public class PetStateMachine
             currentState.OnEntry();
         }
 
-        currentState.Update();
+        currentState.OnUpdate();
     }
 
     public PetStateMachine(PetState initialState)
     {
-        exitState = new PetState();
-        currentState = exitState;
+        this.initialState = initialState;
     }
-
-    public bool Running => currentState != exitState;
 }
 
 public class PetState
 {
-    List<Transition> transitions = new List<Transition>();
+    public List<Transition> Transitions { get; private set; } = new List<Transition>();
+    public List<AtomicAction> EntryActions { get; private set; } = new List<AtomicAction>();
+    public List<AtomicAction> ExitActions { get; private set; } = new List<AtomicAction>();
+    public List<AtomicAction> UpdateActions { get; private set; } = new List<AtomicAction>();
 
     public bool StateChanged(out PetState newState)
     {
         newState = null;
-        foreach(var transition in transitions)
+        foreach(var transition in Transitions)
         {
-            if(transition.IsTriggered())
+            if(transition.Triggered)
             {
                 newState = transition.TargetState;
                 return true;
@@ -54,30 +57,36 @@ public class PetState
         return false;
     }
 
-    public virtual void OnEntry() { }
-    public virtual void OnExit() { }
-    public virtual void Update() { }
+    public void OnEntry() 
+    {
+        foreach (AtomicAction action in EntryActions)
+            action.Use();
+    }
+
+    public void OnExit() 
+    {
+        foreach (AtomicAction action in ExitActions)
+            action.Use();
+    }
+
+    public void OnUpdate() 
+    {
+        foreach (AtomicAction action in UpdateActions)
+            action.Use();
+    }
 }
 
 public class Transition
 {
-    List<ICondition> triggerConditions = new List<ICondition>();
+    ICondition condition;
 
     public PetState TargetState { get; private set; }
 
-    public Transition(PetState targetState, List<ICondition> triggerConditions)
+    public Transition(PetState targetState, ICondition condition)
     {
         this.TargetState = targetState;
-        this.triggerConditions = triggerConditions;
+        this.condition = condition;
     }
 
-    public bool IsTriggered()
-    {
-        foreach(var condition in triggerConditions)
-        {
-            if (!condition.Met)
-                return false;
-        }
-        return true;
-    }
+    public bool Triggered => condition.Met;
 }

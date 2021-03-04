@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Toy : ActionObject
+public class Toy : ActionObject, IPhysicsObject
 {
     [SerializeField] Interaction interaction = null;
     new Rigidbody rigidbody = null;
     new Collider collider = null;
     PetAgent agent = null;
+
+    public Rigidbody Rigidbody => rigidbody;
+
+    public Collider Collider => collider;
 
     public override void Cancel()
     {
@@ -15,13 +19,27 @@ public class Toy : ActionObject
     public override void Use(PetAgent agent)
     {
         Status = ActionStatus.Ongoing;
-        Pursue();
     }
 
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
         collider = GetComponent<Collider>();
+    }
+
+    void AssembleStateMachine(PetAgent agent)
+    {
+        var pursue = new PursuitAction(agent, this);
+        var grab = new GrabAction(agent, this);
+        var release = new ReleaseAction(agent, this);
+
+        var pursuitState = new PetState();
+        var carryState = new PetState();
+
+        var canGrabToy = new InteractionCondition(interaction);
+
+        pursuitState.Transitions.Add(new Transition(carryState, canGrabToy));
+        pursuitState.EntryActions.Add(pursue);
     }
 
     void Update()
@@ -46,12 +64,6 @@ public class Toy : ActionObject
     {
         return rigidbody.velocity.magnitude < 1f;
     }
-
-    void Pursue()
-    {
-        agent.Motor.Pursue(transform, 1f);
-    }
-
     bool CanGrabBall()
     {
         return interaction.PetInRange;
@@ -71,27 +83,5 @@ public class Toy : ActionObject
         rigidbody.isKinematic = false;
         collider.enabled = true;
         rigidbody.velocity = agent.transform.forward + Vector3.up;
-    }
-}
-
-public class PursuitState : PetState
-{
-    MotorSystem pursuer;
-    Transform target;
-
-    public PursuitState(List<Transition> transitions, MotorSystem pursuer, Transform target) : base(transitions)
-    {
-        this.pursuer = pursuer;
-        this.target = target;
-    }
-
-    public override void OnExit()
-    {
-        pursuer.Stop();
-    }
-
-    public override void Update()
-    {
-        pursuer.MoveTo(target.position + target.forward);
     }
 }
