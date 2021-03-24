@@ -5,23 +5,23 @@ public class Learning : MonoBehaviour
 {
     [Tooltip("Actions that can be associated with a command.")]
     [SerializeField] List<string> actionNames = null;
-    Dictionary<string, >
-    bool learning = false;
-    string currentlyLearning = "";
+    Dictionary<string, LearnedAction> learnedActions = new Dictionary<string, LearnedAction>();
+    LearnedAction currentlyLearning = null;
 
     void Start()
     {
         foreach(var name in actionNames)
         {
-            phrases.Add(new Phrase(name));
+            learnedActions.Add(name, new LearnedAction(name));
         }
     }
 
     public void PhraseHeard(string phrase)
     {
-        if (learning)
+        if (currentlyLearning != null)
         {
-
+            var action = learnedActions[currentlyLearning.ActionName];
+            action.PhraseRecognized(phrase);
         }
         else
         {
@@ -35,32 +35,49 @@ public class Learning : MonoBehaviour
     }
 }
 
-public class Phrase
+public class LearnedAction
 {
-    string name;
-    Dictionary<string, int> actionToCount;
+    const string None = "None";
+    int minSampleSize = 5;
+    int sampleSize = 0;
+    float minAccuracy = 0.75f;
 
-    public Phrase(string name)
+    public string AssociatedPhrase { get; private set; } = None;
+
+    public string ActionName { get; private set; }
+    Dictionary<string, int> phraseCountPairs;
+
+    public LearnedAction(string actionName)
     {
-        this.name = name;
+        ActionName = actionName;
+        phraseCountPairs = new Dictionary<string, int>();
     }
 
-    public string LikeliestAction()
+    public void PhraseRecognized(string phrase)
     {
-        float total = TotalTimesRegistered();
-        float highestMatch = 0f;
-        foreach(var entry in actionToCount)
+        if (phraseCountPairs.ContainsKey(phrase))
+            phraseCountPairs[phrase]++;
+        else
+            phraseCountPairs.Add(phrase, 1);
+
+        sampleSize++;
+        EvaluateAssociation();
+    }
+
+    void EvaluateAssociation()
+    {
+        if (sampleSize < minSampleSize)
+            return;
+
+        AssociatedPhrase = None;
+        foreach(var entry in phraseCountPairs)
         {
-            float likelihood = (float)entry.Value / total;
+            float likeliness = (float)entry.Value / sampleSize;
+            if(likeliness >= minAccuracy)
+            {
+                AssociatedPhrase = entry.Key;
+                return;
+            }    
         }
-        return null;
-    }
-
-    public int TotalTimesRegistered()
-    {
-        int result = 0;
-        foreach (var element in actionToCount)
-            result += element.Value;
-        return result;
     }
 }
