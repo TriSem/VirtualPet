@@ -1,18 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Learning : MonoBehaviour
 {
     [Tooltip("Actions that can be associated with a command.")]
-    [SerializeField] List<string> actionNames = null;
-    Dictionary<string, LearnedAction> learnedActions = new Dictionary<string, LearnedAction>();
-    LearnedAction currentlyLearning = null;
+    [SerializeField] List<LearnableAction> learnables = null;
+    [SerializeField] BehaviourSelection behaviourSelection = null;
+    [Tooltip("Determines how many seconds the command bonus will last.")]
+    [SerializeField] float commandDuration = 3;
+
+    Dictionary<string, LearnableAction> learnableActions = new Dictionary<string, LearnableAction>();
+    List<Tuple<LearnableAction, float>> recentlyHeard = new List<Tuple<LearnableAction, float>>();
+    LearnableAction currentlyLearning = null;
 
     void Start()
     {
-        foreach(var name in actionNames)
+        foreach(var learnable in learnables)
         {
-            learnedActions.Add(name, new LearnedAction(name));
+            learnableActions.Add(name, new LearnableAction(learnable.ActionName));
+        }
+
+        foreach(var tuple in recentlyHeard)
+        {
+            if (Time.time >= tuple.Item2)
+                behaviourSelection.EndReinforcement(tuple.Item1.ActionName);
         }
     }
 
@@ -20,34 +32,38 @@ public class Learning : MonoBehaviour
     {
         if (currentlyLearning != null)
         {
-            var action = learnedActions[currentlyLearning.ActionName];
+            var action = learnableActions[currentlyLearning.ActionName];
             action.PhraseRecognized(phrase);
         }
         else
         {
-            NotifyActionSelection();
+            foreach (var entry in learnableActions)
+            {
+                if (entry.Value.AssociatedPhrase == phrase)
+                {
+                    recentlyHeard.Add(new Tuple<LearnableAction, float>(entry.Value, Time.time + commandDuration));
+                    behaviourSelection.ReinforceAction(entry.Value.ActionName);
+                }
+            }
         }
-    }
-
-    void NotifyActionSelection()
-    {
-
     }
 }
 
-public class LearnedAction
+[Serializable]
+public class LearnableAction
 {
     const string None = "None";
-    int minSampleSize = 5;
+    [SerializeField] string actionName;
+    [SerializeField] int minSampleSize = 5;
+    [SerializeField] float minAccuracy = 0.75f;
     int sampleSize = 0;
-    float minAccuracy = 0.75f;
 
     public string AssociatedPhrase { get; private set; } = None;
 
     public string ActionName { get; private set; }
     Dictionary<string, int> phraseCountPairs;
 
-    public LearnedAction(string actionName)
+    public LearnableAction(string actionName)
     {
         ActionName = actionName;
         phraseCountPairs = new Dictionary<string, int>();
