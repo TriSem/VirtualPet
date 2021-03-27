@@ -5,53 +5,43 @@ using UnityEngine;
 public class BehaviourSelection : MonoBehaviour
 {
     [SerializeField] PetAgent agent = default;
-    [SerializeField] Transform reactionSet = default;
+    [SerializeField] Transform internalActionSet = default;
     [SerializeField] ActionObject fallbackBehavior = default;
     [SerializeField] float priorityBonus;
 
     HashSet<string> reinforcedActions;
 
-    List<Reaction> reactions = default;
+    List<ActionObject> internalActions = default;
     public IBehaviour CurrentAction { get; private set; } = default;
     public float CurrentUtility { get; private set; } = 0f;
 
     void Start()
     {
-        reactions = new List<Reaction>(reactionSet.GetComponents<Reaction>());
+        internalActions = new List<ActionObject>(internalActionSet.GetComponents<ActionObject>());
         CurrentAction = fallbackBehavior;
         CurrentAction.Use(agent);
     }
 
     public void EvaluateActions()
     {
-        foreach (var reaction in reactions)
-        {
-            if (reaction.Triggered)
-            {
-                CurrentAction.Cancel();
-                CurrentAction = reaction;
-                CurrentAction.Use(agent);
-                CurrentUtility = float.MaxValue;
-                return;
-            }
-        }
+        var actionUtilities = new List<Tuple<float, IBehaviour>>();
 
         var worldObjects = agent.Perception.GetWorldObjects();
-        var actions = new List<ActionObject>();
+        var actions = new List<ActionObject>(internalActions);
+
         foreach (var worldObject in worldObjects)
         {
             actions.AddRange(worldObject.Actions);
         }
 
-        var actionUtilities = new List<Tuple<float, ActionObject>>();
         foreach (var action in actions)
         {
-            if(action.IsUsable())
+            if(action.PreconditionsMet())
             {
                 float utility = action.CalculateUtility(agent.DriveVector);
                 if (reinforcedActions.Contains(action.GetType().Name))
                     utility += priorityBonus;
-                actionUtilities.Add(new Tuple<float, ActionObject>(utility, action));
+                actionUtilities.Add(new Tuple<float, IBehaviour>(utility, action));
             }
         }
 
@@ -80,17 +70,7 @@ public class BehaviourSelection : MonoBehaviour
         }
     }
 
-    public IBehaviour CheckForReactions()
-    {
-        foreach(var reaction in reactions)
-        {
-            if (reaction.Triggered)
-                return reaction;
-        }
-        return null;
-    }
-
-    public void CullBelowUtility(float utilityThreshold, List<Tuple<float, ActionObject>> actionUtility)
+    public void CullBelowUtility(float utilityThreshold, List<Tuple<float, IBehaviour>> actionUtility)
     {
         for (int i = actionUtility.Count - 1; i > 0; i--)
         {
@@ -99,12 +79,12 @@ public class BehaviourSelection : MonoBehaviour
         }
     }
 
-    public void ReinforceAction(string actionName)
+    public void StartActionPriority(string actionName)
     {
         reinforcedActions.Add(actionName);
     }
     
-    public void EndReinforcement(string actionName)
+    public void EndActionPriority(string actionName)
     {
         reinforcedActions.Remove(actionName);
     }
