@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class MotorSystem : MonoBehaviour
@@ -10,12 +11,14 @@ public class MotorSystem : MonoBehaviour
     [SerializeField] float maximumAngularSpeed = 270f;
     [SerializeField] float baseStoppingDistance = 2f;
 
-    InteractionCondition interactionCondition;
-    DestinationCondition destinationCondition;
-    ICondition currentCondition;
+    bool stopped = true;
 
-    public bool Arrived => currentCondition.Met;
+    internal void MoveTo(Vector3 position)
+    {
+        throw new NotImplementedException();
+    }
 
+    SteeringBehavior currentBehavior = null;
 
     void Start()
     {
@@ -23,17 +26,14 @@ public class MotorSystem : MonoBehaviour
         navAgent.speed = baseSpeed;
         navAgent.angularSpeed = baseAngularSpeed;
         navAgent.stoppingDistance = baseStoppingDistance;
-        destinationCondition = new DestinationCondition(navAgent);
-        currentCondition = destinationCondition;
     }
 
     void Update()
     {
         LimitCurrentSpeed();
-
-        if(Arrived)
+        if(!stopped)
         {
-            navAgent.ResetPath();
+            navAgent.destination = currentBehavior.Destination();
         }
     }
 
@@ -70,24 +70,86 @@ public class MotorSystem : MonoBehaviour
         AdjustAngularSpeed();   
     }
 
-    public void GoInteract(Interaction interaction)
+    public void Pursue(Transform target, float pursueLead)
     {
-        interactionCondition = new InteractionCondition(interaction);
-        navAgent.stoppingDistance = 0.5f;
-        navAgent.destination = interaction.transform.position;
-        currentCondition = interactionCondition;
+        stopped = false;
+        navAgent.updateRotation = true;
+        navAgent.updatePosition = true;
+        currentBehavior = new Pursuit(target, pursueLead);
     }
 
-    public void MoveTo(Vector3 position)
+    public void Wander()
     {
-        navAgent.destination = position;
-        navAgent.stoppingDistance = baseStoppingDistance;
-        currentCondition = destinationCondition;
+        stopped = false;
+        navAgent.updateRotation = true;
+        navAgent.updatePosition = true;
+        currentBehavior = new WanderSteer(navAgent.transform);
+    }
+    
+    public void Follow(Transform target)
+    {
+        stopped = false;
+        navAgent.updateRotation = true;
+        navAgent.updatePosition = true;
+        currentBehavior = new Pursuit(target, 0f);
+    }
+
+    public void Align(Transform target)
+    {
+        navAgent.updateRotation = true;
+        navAgent.updatePosition = false;
+        currentBehavior = new Pursuit(target, 0f);
     }
 
     public void Stop()
     {
         navAgent.ResetPath();
-        currentCondition = destinationCondition;
+        stopped = true;
+    }
+}
+
+public interface SteeringBehavior
+{
+    Vector3 Destination();
+}
+
+public class Pursuit : SteeringBehavior
+{
+    Transform target = null;
+    float lead = 0f;
+
+    public Pursuit(Transform target, float lead)
+    {
+        this.lead = Mathf.Abs(lead);
+        this.target = target;
+    }
+
+    public Vector3 Destination() => target.position + target.forward * lead;
+}
+
+public class WanderSteer : SteeringBehavior
+{
+    Transform agentTransform = null;
+    float radius = 3f;
+    float circleOffset = .5f;
+    float maxAngleChange = 180f;
+
+    public WanderSteer(Transform agentTransform)
+    {
+        this.agentTransform = agentTransform;
+    }
+
+    public Vector3 Destination()
+    {
+        var position = agentTransform.position;
+        var forward = agentTransform.forward;
+        var changeVector = Quaternion.AngleAxis(maxAngleChange * RandomBinomial(), Vector3.up) * forward * radius;
+        var circleCenter = forward * circleOffset;
+        return position + circleCenter + changeVector;
+    }
+
+    public static float RandomBinomial()
+    {
+        return UnityEngine.Random.Range(0f, 1f) - UnityEngine.Random.Range(0f, 1f);
     }
 }
