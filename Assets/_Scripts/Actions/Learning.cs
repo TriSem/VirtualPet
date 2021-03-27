@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Learning : MonoBehaviour
 {
-    [Tooltip("Actions that can be associated with a command.")]
-    [SerializeField] List<LearnableAction> learnables = null;
+    [SerializeField, Tooltip("Actions that can be associated with a command.")]
+    List<LearnableAction> learnables = null;
     [SerializeField] BehaviourSelection behaviourSelection = null;
-    [Tooltip("Determines how many seconds the command bonus will last.")]
-    [SerializeField] float commandDuration = 3;
+
+    [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
+    float commandDuration = 3;
 
     Dictionary<string, LearnableAction> learnableActions = new Dictionary<string, LearnableAction>();
     List<Tuple<LearnableAction, float>> recentlyHeard = new List<Tuple<LearnableAction, float>>();
@@ -20,11 +21,15 @@ public class Learning : MonoBehaviour
         {
             learnableActions.Add(name, new LearnableAction(learnable.ActionName));
         }
+    }
 
-        foreach(var tuple in recentlyHeard)
+    void Update()
+    {
+        // Remove priority if command was issued too long ago.
+        foreach (var tuple in recentlyHeard)
         {
             if (Time.time >= tuple.Item2)
-                behaviourSelection.EndReinforcement(tuple.Item1.ActionName);
+                behaviourSelection.EndActionPriority(tuple.Item1.ActionName);
         }
     }
 
@@ -42,7 +47,7 @@ public class Learning : MonoBehaviour
                 if (entry.Value.AssociatedPhrase == phrase)
                 {
                     recentlyHeard.Add(new Tuple<LearnableAction, float>(entry.Value, Time.time + commandDuration));
-                    behaviourSelection.ReinforceAction(entry.Value.ActionName);
+                    behaviourSelection.StartActionPriority(entry.Value.ActionName);
                 }
             }
         }

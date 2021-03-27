@@ -1,87 +1,92 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Toy : ActionObject, IPhysicsObject
 {
     [SerializeField] Interaction interaction = null;
-    new Rigidbody rigidbody = null;
-    new Collider collider = null;
-    PetAgent agent = null;
+    PetStateMachine stateMachine = null;
 
-    public Rigidbody Rigidbody => rigidbody;
+    public Rigidbody Rigidbody { get; private set; } = null;
 
-    public Collider Collider => collider;
+    public Collider Collider { get; private set; } = null;
 
     public override void Cancel()
     {
+        stateMachine.Stop();
+        Status = ActionStatus.Inactive;
+        Debug.Log("Toy stop.");
     }
 
     public override void Use(PetAgent agent)
     {
         Status = ActionStatus.Ongoing;
+        stateMachine.Start(agent, this);
+        Debug.Log("Toy start");
     }
 
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody>();
-        collider = GetComponent<Collider>();
-    }
+        Rigidbody = GetComponent<Rigidbody>();
+        Collider = GetComponent<Collider>();
 
-    void AssembleStateMachine(PetAgent agent)
-    {
-        var pursue = new PursuitAction(agent, this);
-        var grab = new GrabAction(agent, this);
-        var release = new ReleaseAction(agent, this);
-
-        var pursuitState = new PetState();
-        var carryState = new PetState();
-
-        var canGrabToy = new InteractionCondition(interaction);
-
-        pursuitState.Transitions.Add(new Transition(carryState, canGrabToy));
-        pursuitState.EntryActions.Add(pursue);
+        var pursuit = new PursueState();
+        var playAndWander = new PlayAndWander();
+        var canInteract = new InteractionCondition(interaction);
+        pursuit.Transitions.Add(new Transition(playAndWander, canInteract));
+        stateMachine = new PetStateMachine(pursuit);
     }
 
     void Update()
     {
+        stateMachine.Update();
+    }
+}
+
+public class PursueState : PetState
+{
+    public override void OnEntry(PetAgent agent, ActionObject actionObject)
+    {
+        agent.Motor.Pursue(actionObject.transform, 0f);
+        Debug.Log("Enter pursuit.");
     }
 
-    public void SetPhysicsEnabled(bool enabled)
+    public override void OnExit(PetAgent agent, ActionObject actionObject)
     {
-        if(enabled)
+        agent.Motor.Stop();
+        Debug.Log("Leave pursuit.");
+    }
+
+    public override void OnUpdate(PetAgent agent, ActionObject actionObject)
+    {
+    }
+}
+
+public class PlayAndWander : PetState
+{
+    float nextShakeTime;
+
+    public override void OnEntry(PetAgent agent, ActionObject actionObject)
+    {
+        agent.Motor.Wander();
+        agent.Snoot.Carry(actionObject);
+        nextShakeTime = Time.time + Random.Range(1f, 5f);
+        Debug.Log("Enter play and wander.");
+    }
+
+    public override void OnExit(PetAgent agent, ActionObject actionObject)
+    {
+        agent.Motor.Stop();
+        agent.Snoot.Release();
+        Debug.Log("Leave play and wander.");
+    }
+
+    public override void OnUpdate(PetAgent agent, ActionObject actionObject)
+    {
+        float time = Time.time;
+        if(time > nextShakeTime)
         {
-            collider.enabled = true;
-            rigidbody.isKinematic = false;
+            // Play shake animation
+            nextShakeTime = time + Random.Range(1f, 5f);
         }
-        else
-        {
-            collider.enabled = false;
-            rigidbody.isKinematic = true;
-        }
-    }
-
-    public override bool IsUsable()
-    {
-        return rigidbody.velocity.magnitude < 1f;
-    }
-    bool CanGrabBall()
-    {
-        return interaction.PetInRange;
-    }
-
-    void Grab()
-    {
-        rigidbody.isKinematic = true;
-        collider.enabled = false;
-        transform.parent = agent.Snoot.transform;
-        transform.localPosition = agent.Snoot.transform.position;
-    }
-
-    void Throw()
-    {
-        transform.parent = null;
-        rigidbody.isKinematic = false;
-        collider.enabled = true;
-        rigidbody.velocity = agent.transform.forward + Vector3.up;
     }
 }

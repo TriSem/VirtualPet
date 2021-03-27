@@ -8,7 +8,7 @@ public class PetAgent : MonoBehaviour
     [SerializeField] MotorSystem motorSystem = null;
     [SerializeField] Perception perception = null;
     [SerializeField] Stomach stomach = null;
-    [SerializeField] Transform snoot = null;
+    [SerializeField] Grasp snoot = null;
     BehaviourSelection actionSelection = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
@@ -17,10 +17,9 @@ public class PetAgent : MonoBehaviour
     public Perception Perception => perception;
     public DriveVector DriveVector { get; } = new DriveVector();
     public MotorSystem Motor => motorSystem;
-    public Transform Snoot => snoot;
+    public Grasp Snoot => snoot;
 
     float lastTick = (1 / 5);
-
 
     void Awake()
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class VisualSensor : MonoBehaviour, ISensor
+public class VisualSensor : Sensor
 {
     [SerializeField] Perception perception = null;
     [SerializeField] float minimumSignalStrength = 1f;
@@ -10,11 +10,16 @@ public class VisualSensor : MonoBehaviour, ISensor
     [SerializeField, Range(0f, 1f)] float attenuation = 1f;
     [SerializeField] Light visualization;
 
-    public Modalities AssociatedModalities => Modalities.Visual;
-
-    public List<WorldObject> PercievedObjects()
+    public override HashSet<WorldObject> GetPercievedObjects()
     {
-        throw new System.NotImplementedException();
+        var objects = WorldBlackboard.Instance.GetObjects();
+        var percievedObjects = new HashSet<WorldObject>();
+        foreach(var worldObject in objects)
+        {
+            if (CanPercieve(worldObject))
+                percievedObjects.Add(worldObject);
+        }
+        return percievedObjects;
     }
 
     bool CanPercieve(WorldObject worldObject)
@@ -34,10 +39,4 @@ public class VisualSensor : MonoBehaviour, ISensor
         visualization.innerSpotAngle = visionAngle;
         visualization.spotAngle = visionAngle;
     }
-}
-
-public interface ISensor
-{
-    List<WorldObject> PercievedObjects();
-    Modalities AssociatedModalities { get; }
 }

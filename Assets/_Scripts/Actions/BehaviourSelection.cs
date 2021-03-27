@@ -7,9 +7,9 @@ public class BehaviourSelection : MonoBehaviour
     [SerializeField] PetAgent agent = default;
     [SerializeField] Transform internalActionSet = default;
     [SerializeField] ActionObject fallbackBehavior = default;
-    [SerializeField] float priorityBonus;
+    [SerializeField] float commandBonus;
 
-    HashSet<string> reinforcedActions;
+    HashSet<string> reinforcedActions = new HashSet<string>();
 
     List<ActionObject> internalActions = default;
     public IBehaviour CurrentAction { get; private set; } = default;
@@ -26,12 +26,12 @@ public class BehaviourSelection : MonoBehaviour
     {
         var actionUtilities = new List<Tuple<float, IBehaviour>>();
 
-        var worldObjects = agent.Perception.GetWorldObjects();
+        var stimuli = agent.Perception.Poll();
         var actions = new List<ActionObject>(internalActions);
 
-        foreach (var worldObject in worldObjects)
+        foreach (var stimulus in stimuli)
         {
-            actions.AddRange(worldObject.Actions);
+            actions.AddRange(stimulus.WorldObject.Actions);
         }
 
         foreach (var action in actions)
@@ -39,8 +39,9 @@ public class BehaviourSelection : MonoBehaviour
             if(action.PreconditionsMet())
             {
                 float utility = action.CalculateUtility(agent.DriveVector);
+                utility += action.PriorityBonus;
                 if (reinforcedActions.Contains(action.GetType().Name))
-                    utility += priorityBonus;
+                    utility += commandBonus;
                 actionUtilities.Add(new Tuple<float, IBehaviour>(utility, action));
             }
         }

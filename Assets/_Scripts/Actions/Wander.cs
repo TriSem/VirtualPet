@@ -3,27 +3,21 @@
 public class Wander : ActionObject
 {
     MotorSystem motor = null;
-    [SerializeField] float speed = 2f;
-    [SerializeField] float maxRotation = 90f;
 
     public override void Cancel()
     {
         Status = ActionStatus.Inactive;
+        motor.Stop();
     }
 
     public override void Use(PetAgent agent)
     {
+        Status = ActionStatus.Ongoing;
+        motor = agent.Motor;
+        motor.Wander();
     }
 
     void Update()
     {
-        if(Status == ActionStatus.Ongoing)
-        {
-        }
-    }
-
-    float RandomBinomial()
-    {
-        return Random.Range(0f, 1f) - Random.Range(0f, 1f);
     }
 }

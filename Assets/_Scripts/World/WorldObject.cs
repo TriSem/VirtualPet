@@ -9,10 +9,14 @@ public sealed class WorldObject : MonoBehaviour
     [SerializeField] float audibility = 0f;
     [SerializeField] float smelliness = 0f;
 
+    Rigidbody rigidBody;
+
     public string Name => objectName;
     public float Visibility => visibility;
     public float Audibility => audibility;
     public float Smelliness => smelliness;
+
+    public Vector3 Velocity => rigidBody?.velocity ?? Vector3.zero;
 
     public List<ActionObject> Actions { get; private set; }
 
@@ -21,6 +25,7 @@ public sealed class WorldObject : MonoBehaviour
     void Start()
     {
         Actions = new List<ActionObject>(GetComponents<ActionObject>());
+        rigidBody = GetComponent<Rigidbody>();
     }
 
     void OnEnable() => WorldBlackboard.Instance.Add(this);
@@ -44,5 +49,5 @@ public sealed class WorldBlackboard
 
     public void Remove(WorldObject worldObject) => worldObjects.Remove(worldObject);
 
-    public List<WorldObject> GetObjects() => new List<WorldObject>(worldObjects);
+    public HashSet<WorldObject> GetObjects() => new HashSet<WorldObject>(worldObjects);
 }

@@ -1,92 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class Perception : MonoBehaviour
 {
-    [SerializeField] float visiblityThreshold = 1f;
-    [SerializeField] float audibilityThreshold = 1f;
-    [SerializeField] float smellThreshold = 1f;
+    readonly StimulusMap stimuli = new StimulusMap();
+    [SerializeField] List<Sensor> sensors;
 
-    public float VisibilityThreshold => visiblityThreshold;
-    public float AudibilityThreshold => audibilityThreshold;
-    public float SmellThreshold => smellThreshold;
-
-    readonly Dictionary<PerceptionType, HashSet<WorldObject>> perceptions = 
-        new Dictionary<PerceptionType, HashSet<WorldObject>>();
-
-    void Start()
+    public List<Stimulus> Poll()
     {
-        var perceptionTypes = (PerceptionType[])Enum.GetValues(typeof(PerceptionType));
-        foreach(var type in perceptionTypes)
+        stimuli.Clear();
+        foreach(var sensor in sensors)
         {
-            perceptions.Add(type, new HashSet<WorldObject>());
+            var worldObjects = sensor.GetPercievedObjects();
+            foreach (var worldObject in worldObjects)
+            {
+                if (stimuli.Contains(worldObject))
+                    stimuli[worldObject].Modalities |= sensor.Modalities;
+                else
+                {
+                    var stimulus = new Stimulus(worldObject);
+                    stimulus.Modalities = sensor.Modalities;
+                }
+            }
         }
-    }
-
-    void Update()
-    {
-        TrimDeletedObjects();
-    }
-
-    public void Add(PerceptionType type, WorldObject worldObject)
-    {
-        try
-        {
-            perceptions[type].Add(worldObject);
-        }
-        catch
-        {
-            return;
-        }
-    }
-
-    public void Remove(PerceptionType type, WorldObject worldObject)
-    {
-        try
-        {
-            perceptions[type].Remove(worldObject);
-        }
-        catch
-        {
-            return;
-        }
-    }
-
-    public void RemoveFromPerception(WorldObject worldObject)
-    {
-        foreach(var perception in perceptions)
-        {
-            perception.Value.Remove(worldObject);
-        }
-    }
-
-    public HashSet<WorldObject> GetWorldObjects()
-    {
-        HashSet<WorldObject> worldObjects = new HashSet<WorldObject>();
-        foreach(var element in perceptions)
-        {
-            worldObjects.UnionWith(element.Value);
-        }
-        return worldObjects;
-    }
-
-    void TrimDeletedObjects()
-    {
-        HashSet<WorldObject> deletedObjects = new HashSet<WorldObject>();
-        foreach(var visual in perceptions[PerceptionType.Visual])
-        {
-            if (visual == null)
-                deletedObjects.Add(visual);
-        }
-
-        perceptions[PerceptionType.Visual].ExceptWith(deletedObjects);
+        return new List<Stimulus>(stimuli);
     }
 }
 
-public enum PerceptionType
+public class Stimulus
 {
-    Visual,
-    Audio,
-    Smell
+    public WorldObject WorldObject { get; private set; }
+    public Modalities Modalities { get; set; } = Modalities.None;
+
+    public Stimulus(WorldObject worldObject)
+    {
+        WorldObject = worldObject;
+    }
+
+    public float Salience() => 1f;
+
+}
+
+public class StimulusMap : KeyedCollection<WorldObject, Stimulus>
+{
+    protected override WorldObject GetKeyForItem(Stimulus stimulus)
+    {
+        return stimulus.WorldObject;
+    }
+}
+
+
+[Flags]
+public enum Modalities
+{
+    None = 0,
+    Visual = 1,
+    Audio = 2,
+    Smell = 4
 }

@@ -1,32 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 public class PetStateMachine
 {
     PetState initialState;
     PetState currentState;
+    PetAgent agent;
+    ActionObject actionObject;
+    bool running = false;
 
-    public void Start()
+    public void Start(PetAgent agent, ActionObject actionObject)
     {
+        running = true;
         currentState = initialState;
+        currentState.OnEntry(agent, actionObject);
+        this.agent = agent;
+        this.actionObject = actionObject;
     }
 
     public void Stop()
     {
-        currentState.OnExit();
+        currentState.OnExit(agent, actionObject);
+        running = false;
     }
 
     public void Update()
     {
+        if (!running)
+            return;
+
         if(currentState.StateChanged(out PetState newState))
         {
-            currentState.OnExit();
+            currentState.OnExit(agent, actionObject);
             currentState = newState;
-            currentState.OnEntry();
+            currentState.OnEntry(agent, actionObject);
         }
 
-        currentState.OnUpdate();
+        currentState.OnUpdate(agent, actionObject);
     }
 
     public PetStateMachine(PetState initialState)
@@ -35,12 +44,9 @@ public class PetStateMachine
     }
 }
 
-public class PetState
+public abstract class PetState
 {
     public List<Transition> Transitions { get; private set; } = new List<Transition>();
-    public List<AtomicAction> EntryActions { get; private set; } = new List<AtomicAction>();
-    public List<AtomicAction> ExitActions { get; private set; } = new List<AtomicAction>();
-    public List<AtomicAction> UpdateActions { get; private set; } = new List<AtomicAction>();
 
     public bool StateChanged(out PetState newState)
     {
@@ -57,23 +63,11 @@ public class PetState
         return false;
     }
 
-    public void OnEntry() 
-    {
-        foreach (AtomicAction action in EntryActions)
-            action.Use();
-    }
+    public abstract void OnEntry(PetAgent agent, ActionObject actionObject);
 
-    public void OnExit() 
-    {
-        foreach (AtomicAction action in ExitActions)
-            action.Use();
-    }
+    public abstract void OnExit(PetAgent agent, ActionObject actionObject);
 
-    public void OnUpdate() 
-    {
-        foreach (AtomicAction action in UpdateActions)
-            action.Use();
-    }
+    public abstract void OnUpdate(PetAgent agent, ActionObject actionObject);
 }
 
 public class Transition
@@ -89,4 +83,20 @@ public class Transition
     }
 
     public bool Triggered => condition.Met;
+}
+
+public class ExitState : PetState
+{
+    public override void OnEntry(PetAgent agent, ActionObject actionObject)
+    {
+        actionObject.Cancel();
+    }
+
+    public override void OnExit(PetAgent agent, ActionObject actionObject)
+    {
+    }
+
+    public override void OnUpdate(PetAgent agent, ActionObject actionObject)
+    {
+    }
 }

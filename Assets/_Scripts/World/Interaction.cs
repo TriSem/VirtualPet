@@ -2,14 +2,14 @@
 
 public class Interaction : MonoBehaviour
 {
-    new Collider collider = default;
+    new SphereCollider collider = default;
 
     public bool PlayerInRange { get; private set; } = false;
     public bool PetInRange { get; private set; }
 
     void Start()
     {
-        collider = GetComponent<Collider>();
+        collider = GetComponent<SphereCollider>();
     }
 
     void OnTriggerEnter(Collider other)
@@ -27,4 +27,6 @@ public class Interaction : MonoBehaviour
         else if (other.CompareTag("Player"))
             PlayerInRange = false;
     }
+
+    public float InteractionRadius => collider.radius;
 }

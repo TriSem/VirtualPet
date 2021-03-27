@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Sit : Reaction, IAudioReciever
+public class Sit : ActionObject, IAudioReciever
 {
     [SerializeField, Range(0, 100)]
     int learnedAfterRepitition = 10;
@@ -39,7 +39,6 @@ public class Sit : Reaction, IAudioReciever
     {
         if (learned && command == Command.Sit)
         {
-            Triggered = true;
             Debug.Log("Sit understood.");
         }
         if (learningEnabled && command == Command.Sit)
@@ -57,7 +56,6 @@ public class Sit : Reaction, IAudioReciever
 
     public override void Use(PetAgent agent)
     {
-        Triggered = false;
         Status = ActionStatus.Ongoing;
         if(!learned)
         {
@@ -73,17 +71,11 @@ public class Sit : Reaction, IAudioReciever
     void Update()
     {
         if (tagTrigger.Triggered)
-            Triggered = true;
 
         if(Status == ActionStatus.Ongoing)
         {
             if (Time.time > stopSittingTime)
                 Cancel();
         }
-    }
-
-    public override bool CanDoBoth(IBehaviour other)
-    {
-        return false;
     }
 }
