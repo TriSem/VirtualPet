@@ -16,7 +16,7 @@ public abstract class ActionObject : MonoBehaviour, IBehaviour
 
     public ActionStatus Status { get; protected set; } = ActionStatus.Inactive;
 
-    public virtual bool PreconditionsMet() => true;
+    public virtual bool PreconditionsMet(InternalModel internalModel) => true;
 
     public  float CalculateUtility(DriveVector drives) => drives.CalculateUtility(outcomes) + priorityBonus;
 
@@ -37,4 +37,39 @@ public interface IPhysicsObject
 {
     Rigidbody Rigidbody { get; }
     Collider Collider { get; }
+}
+
+public interface IIntermediary
+{
+    HashSet<InternalState> GetPredictedChanges();
+    void TransitionToNext();
+}
+
+public class ActionSequence
+{
+    ActionObject[] actions;
+    int currentStage = 0;
+
+    public int Length { get; private set; }
+
+    public ActionStatus Status
+    {
+        get => actions[currentStage].Status == ActionStatus.Ongoing ? ActionStatus.Ongoing : ActionStatus.Inactive;
+        private set => Status = value; 
+    } 
+
+    public ActionSequence(ActionObject[] actions)
+    {
+        this.actions = actions;
+    }
+
+    bool IsInSequence(ActionObject actionObject)
+    {
+        foreach(var action in actions)
+        {
+            if (action == actionObject)
+                return true;
+        }
+        return false;
+    }
 }

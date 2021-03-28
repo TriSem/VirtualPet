@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent), typeof(BehaviourSelection))]
@@ -12,6 +13,7 @@ public class PetAgent : MonoBehaviour
     BehaviourSelection actionSelection = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
+    public InternalModel InternalModel { get; private set; } = new InternalModel();
 
     public Stomach Stomach => stomach;
     public Perception Perception => perception;
@@ -36,4 +38,46 @@ public class PetAgent : MonoBehaviour
             actionSelection.EvaluateActions();
         }
     }
+}
+
+public class InternalModel
+{
+    HashSet<InternalState> internalStates = new HashSet<InternalState>();
+
+    public void Add(InternalState internalState) => internalStates.Add(internalState);
+
+    public void Add(HashSet<InternalState> internalStates) => internalStates.UnionWith(internalStates);
+
+    public void Remove(InternalState internalState) => internalStates.Add(internalState);
+
+    public void Remove(HashSet<InternalState>) => internalStates.IntersectWith(internalStates);
+
+    public bool Contains(InternalState internalState) => internalStates.Contains(internalState);
+
+    public bool ContainsAll(HashSet<InternalState> other) => other.IsSubsetOf(internalStates);
+
+    public bool ContainsNone(HashSet<InternalState> other) => !other.Overlaps(internalStates);
+
+    public InternalModel CopyAndAdd(HashSet<InternalState> internalStates)
+    {
+        var copy = new InternalModel(this);
+        copy.internalStates.UnionWith(internalStates);
+        return copy;
+    }
+
+    public InternalModel() { }
+
+    // Deep copy constructor.
+    public InternalModel(InternalModel other)
+    {
+        internalStates = new HashSet<InternalState>(other.internalStates);
+    }
+}
+
+public enum InternalState
+{
+    Carrying,
+    Sitting,
+    LyingDown,
+    BeingPet
 }

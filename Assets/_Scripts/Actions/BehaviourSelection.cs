@@ -24,52 +24,98 @@ public class BehaviourSelection : MonoBehaviour
 
     public void EvaluateActions()
     {
-        var actionUtilities = new List<Tuple<float, IBehaviour>>();
+        ActionObject[] actionChain = new ActionObject[2];
+        var model = new InternalModel(agent.InternalModel);
+        var differences = new HashSet<InternalState>();
 
         var stimuli = agent.Perception.Poll();
-        var actions = new List<ActionObject>(internalActions);
 
-        foreach (var stimulus in stimuli)
-        {
-            actions.AddRange(stimulus.WorldObject.Actions);
-        }
+        var possibleActions = new List<ActionObject>();
+        var impossibleActions = new List<ActionObject>();
 
-        foreach (var action in actions)
+        foreach(var stimulus in stimuli)
         {
-            if(action.PreconditionsMet())
+            var actions = stimulus.WorldObject.Actions;
+            foreach(var action in actions)
             {
-                float utility = action.CalculateUtility(agent.DriveVector);
-                utility += action.PriorityBonus;
-                if (reinforcedActions.Contains(action.GetType().Name))
-                    utility += commandBonus;
-                actionUtilities.Add(new Tuple<float, IBehaviour>(utility, action));
+                if (action.PreconditionsMet(model))
+                    possibleActions.Add(action);
+                else
+                    impossibleActions.Add(action);
             }
         }
 
-        if(actionUtilities.Count > 0)
+        foreach(var action in possibleActions)
         {
-            actionUtilities.Sort((x, y) => y.Item1.CompareTo(x.Item1));
-            float highestUtility = actionUtilities[0].Item1;
-            if(CurrentAction.Status == ActionStatus.Ongoing && highestUtility <= CurrentUtility)
+            if(action is IIntermediary intermediary)
             {
-                return;
+                var predictedChanges = intermediary.GetPredictedChanges();
+                model.Add(predictedChanges);
+                var enabledActions = EnabledActions(impossibleActions, model);
+                model.Remove(predictedChanges);
             }
-
-            if(CurrentAction.Status == ActionStatus.Inactive)
-            {
-                CullBelowUtility(highestUtility * 0.9f, actionUtilities);
-            }
-            else
-            {
-                CullBelowUtility(CurrentUtility, actionUtilities);
-            }
-
-            int index = UnityEngine.Random.Range(0, actionUtilities.Count - 1);
-            CurrentUtility = actionUtilities[index].Item1;
-            CurrentAction = actionUtilities[index].Item2;
-            CurrentAction.Use(agent);
         }
     }
+
+    public List<ActionObject> EnabledActions(List<ActionObject> previouslyImpossible, InternalModel predictedModel)
+    {
+        var nowPossible = new List<ActionObject>();
+        foreach(var action in previouslyImpossible)
+        {
+            if (action.PreconditionsMet(predictedModel))
+                nowPossible.Add(action);
+        }
+        return nowPossible;
+    }
+
+    //public void EvaluateActions()
+    //{
+    //    var actionUtilities = new List<Tuple<float, IBehaviour>>();
+
+    //    var stimuli = agent.Perception.Poll();
+    //    var actions = new List<ActionObject>(internalActions);
+
+    //    foreach (var stimulus in stimuli)
+    //    {
+    //        actions.AddRange(stimulus.WorldObject.Actions);
+    //    }
+
+    //    foreach (var action in actions)
+    //    {
+    //        if(action.PreconditionsMet(agent))
+    //        {
+    //            float utility = action.CalculateUtility(agent.DriveVector);
+    //            utility += action.PriorityBonus;
+    //            if (reinforcedActions.Contains(action.GetType().Name))
+    //                utility += commandBonus;
+    //            actionUtilities.Add(new Tuple<float, IBehaviour>(utility, action));
+    //        }
+    //    }
+
+    //    if(actionUtilities.Count > 0)
+    //    {
+    //        actionUtilities.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+    //        float highestUtility = actionUtilities[0].Item1;
+    //        if(CurrentAction.Status == ActionStatus.Ongoing && highestUtility <= CurrentUtility)
+    //        {
+    //            return;
+    //        }
+
+    //        if(CurrentAction.Status == ActionStatus.Inactive)
+    //        {
+    //            CullBelowUtility(highestUtility * 0.9f, actionUtilities);
+    //        }
+    //        else
+    //        {
+    //            CullBelowUtility(CurrentUtility, actionUtilities);
+    //        }
+
+    //        int index = UnityEngine.Random.Range(0, actionUtilities.Count - 1);
+    //        CurrentUtility = actionUtilities[index].Item1;
+    //        CurrentAction = actionUtilities[index].Item2;
+    //        CurrentAction.Use(agent);
+    //    }
+    //}
 
     public void CullBelowUtility(float utilityThreshold, List<Tuple<float, IBehaviour>> actionUtility)
     {
