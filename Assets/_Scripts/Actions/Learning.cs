@@ -29,7 +29,7 @@ public class Learning : MonoBehaviour
         foreach (var tuple in recentlyHeard)
         {
             if (Time.time >= tuple.Item2)
-                behaviourSelection.EndActionPriority(tuple.Item1.ActionName);
+                behaviourSelection.StopCommanding(tuple.Item1.ActionName);
         }
     }
 
@@ -47,7 +47,7 @@ public class Learning : MonoBehaviour
                 if (entry.Value.AssociatedPhrase == phrase)
                 {
                     recentlyHeard.Add(new Tuple<LearnableAction, float>(entry.Value, Time.time + commandDuration));
-                    behaviourSelection.StartActionPriority(entry.Value.ActionName);
+                    behaviourSelection.StartCommanding(entry.Value.ActionName);
                 }
             }
         }

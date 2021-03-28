@@ -2,13 +2,14 @@
 
 public class Grasp : MonoBehaviour
 {
+    [SerializeField] PetAgent agent = null;
     ActionObject carried = null;
 
-    public bool Empty => carried == null;
+    public bool Carrying => carried != null;
 
     public void Carry(ActionObject actionObject)
     {
-        if (!Empty)
+        if (Carrying)
             Release();
 
         if(actionObject is IPhysicsObject physicsObject)
@@ -20,6 +21,7 @@ public class Grasp : MonoBehaviour
         carried = actionObject;
         carried.transform.parent = transform;
         carried.transform.localPosition = Vector3.zero;
+        agent.InternalModel.Add(InternalState.Carrying);
     }
 
     public void Release()
@@ -30,6 +32,7 @@ public class Grasp : MonoBehaviour
             physicsObject.Collider.enabled = true;
         }
 
+        agent.InternalModel.Remove(InternalState.Carrying);
         carried.transform.parent = null;
         carried = null;
     }

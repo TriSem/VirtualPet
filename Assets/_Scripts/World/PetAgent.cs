@@ -50,7 +50,7 @@ public class InternalModel
 
     public void Remove(InternalState internalState) => internalStates.Add(internalState);
 
-    public void Remove(HashSet<InternalState>) => internalStates.IntersectWith(internalStates);
+    public void Remove(HashSet<InternalState> internalStates) => internalStates.IntersectWith(internalStates);
 
     public bool Contains(InternalState internalState) => internalStates.Contains(internalState);
 

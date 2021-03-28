@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class BehaviourSelection : MonoBehaviour
@@ -9,51 +8,89 @@ public class BehaviourSelection : MonoBehaviour
     [SerializeField] ActionObject fallbackBehavior = default;
     [SerializeField] float commandBonus;
 
-    HashSet<string> reinforcedActions = new HashSet<string>();
+    HashSet<string> commandedActions = new HashSet<string>();
 
     List<ActionObject> internalActions = default;
-    public IBehaviour CurrentAction { get; private set; } = default;
-    public float CurrentUtility { get; private set; } = 0f;
+    public Option CurrentOption { get; private set; } = default;
 
     void Start()
     {
         internalActions = new List<ActionObject>(internalActionSet.GetComponents<ActionObject>());
-        CurrentAction = fallbackBehavior;
-        CurrentAction.Use(agent);
+        CurrentOption = new Option(fallbackBehavior);
+        CurrentOption.Use(agent);
     }
 
     public void EvaluateActions()
     {
-        ActionObject[] actionChain = new ActionObject[2];
         var model = new InternalModel(agent.InternalModel);
-        var differences = new HashSet<InternalState>();
 
-        var stimuli = agent.Perception.Poll();
+        var percievedObjects = agent.Perception.Poll();
+        var allActions = new List<ActionObject>(internalActions);
+        foreach (var percieved in percievedObjects)
+            allActions.AddRange(percieved.Actions);
 
         var possibleActions = new List<ActionObject>();
         var impossibleActions = new List<ActionObject>();
 
-        foreach(var stimulus in stimuli)
+        List<Option> options = new List<Option>();
+
+        foreach(var action in allActions)
         {
-            var actions = stimulus.WorldObject.Actions;
-            foreach(var action in actions)
-            {
-                if (action.PreconditionsMet(model))
-                    possibleActions.Add(action);
-                else
-                    impossibleActions.Add(action);
-            }
+            if (action.PreconditionsMet(model))
+                possibleActions.Add(action);
+            else
+                impossibleActions.Add(action);
         }
 
+        // Add all action sequences
         foreach(var action in possibleActions)
         {
-            if(action is IIntermediary intermediary)
+            // Even intermediaries can be chosen alone.
+            var option = new Option(action);
+            option.TotalUtility = TotalUtility(option);
+            options.Add(option);
+
+            if(action is IntermediaryAction intermediary)
             {
+                // Develop two-step plan.
                 var predictedChanges = intermediary.GetPredictedChanges();
                 model.Add(predictedChanges);
                 var enabledActions = EnabledActions(impossibleActions, model);
                 model.Remove(predictedChanges);
+
+                foreach(var enabledAction in enabledActions)
+                {
+                    option = new Option(enabledAction, intermediary);
+                    option.TotalUtility = TotalUtility(option);
+                    options.Add(option);
+                }
             }
+        }
+
+        if(options.Count > 0)
+        {
+            options.Sort((x, y) => y.TotalUtility.CompareTo(x.TotalUtility));
+            float highestUtility = options[0].TotalUtility;
+            var actionStatus = CurrentOption.GetStatus();
+            if (actionStatus == ActionStatus.Ongoing && highestUtility <= CurrentOption.TotalUtility)
+            {
+                return;
+            }
+
+            if (actionStatus == ActionStatus.Inactive || actionStatus == ActionStatus.Completed)
+            {
+                // Select several reasonable options to randomly choose from.
+                CullBelowUtility(highestUtility * 0.9f, options);
+            }
+            else
+            {
+                // Ongoing abilities should only be interrupted if they are suboptimal.
+                CullBelowUtility(CurrentOption.TotalUtility, options);
+            }
+
+            int index = Random.Range(0, options.Count - 1);
+            CurrentOption = options[index];
+            CurrentOption.Use(agent);
         }
     }
 
@@ -68,71 +105,81 @@ public class BehaviourSelection : MonoBehaviour
         return nowPossible;
     }
 
-    //public void EvaluateActions()
-    //{
-    //    var actionUtilities = new List<Tuple<float, IBehaviour>>();
-
-    //    var stimuli = agent.Perception.Poll();
-    //    var actions = new List<ActionObject>(internalActions);
-
-    //    foreach (var stimulus in stimuli)
-    //    {
-    //        actions.AddRange(stimulus.WorldObject.Actions);
-    //    }
-
-    //    foreach (var action in actions)
-    //    {
-    //        if(action.PreconditionsMet(agent))
-    //        {
-    //            float utility = action.CalculateUtility(agent.DriveVector);
-    //            utility += action.PriorityBonus;
-    //            if (reinforcedActions.Contains(action.GetType().Name))
-    //                utility += commandBonus;
-    //            actionUtilities.Add(new Tuple<float, IBehaviour>(utility, action));
-    //        }
-    //    }
-
-    //    if(actionUtilities.Count > 0)
-    //    {
-    //        actionUtilities.Sort((x, y) => y.Item1.CompareTo(x.Item1));
-    //        float highestUtility = actionUtilities[0].Item1;
-    //        if(CurrentAction.Status == ActionStatus.Ongoing && highestUtility <= CurrentUtility)
-    //        {
-    //            return;
-    //        }
-
-    //        if(CurrentAction.Status == ActionStatus.Inactive)
-    //        {
-    //            CullBelowUtility(highestUtility * 0.9f, actionUtilities);
-    //        }
-    //        else
-    //        {
-    //            CullBelowUtility(CurrentUtility, actionUtilities);
-    //        }
-
-    //        int index = UnityEngine.Random.Range(0, actionUtilities.Count - 1);
-    //        CurrentUtility = actionUtilities[index].Item1;
-    //        CurrentAction = actionUtilities[index].Item2;
-    //        CurrentAction.Use(agent);
-    //    }
-    //}
-
-    public void CullBelowUtility(float utilityThreshold, List<Tuple<float, IBehaviour>> actionUtility)
+    public float TotalUtility(Option option)
     {
-        for (int i = actionUtility.Count - 1; i > 0; i--)
+        float utility = option.Main.PriorityBonus + option.Main.CalculateUtility(agent.DriveVector);
+        utility += (option.Intermediary?.CalculateUtility(agent.DriveVector) + option.Intermediary?.PriorityBonus) ?? 0f;
+
+        // Grant a bonus if the action was commanded by the player.
+        string actionName = option.Main.GetType().Name;
+        utility += commandedActions.Contains(actionName) ? commandBonus : 0f;
+
+        return utility;
+    }
+
+    public void CullBelowUtility(float utilityThreshold, List<Option> options)
+    {
+        for (int i = options.Count - 1; i > 0; i--)
         {
-            if (actionUtility[i].Item1 < utilityThreshold)
-                actionUtility.RemoveAt(i);
+            if (options[i].TotalUtility < utilityThreshold)
+                options.RemoveAt(i);
         }
     }
 
-    public void StartActionPriority(string actionName)
+    // The named action will start recieving a bonus when calculating utility.
+    public void StartCommanding(string actionName)
     {
-        reinforcedActions.Add(actionName);
+        commandedActions.Add(actionName);
     }
     
-    public void EndActionPriority(string actionName)
+    public void StopCommanding(string actionName)
     {
-        reinforcedActions.Remove(actionName);
+        commandedActions.Remove(actionName);
+    }
+}
+
+public class Option
+{
+    public IntermediaryAction Intermediary{ get; private set; } = null;
+    public ActionObject Main { get; private set; }
+    public float TotalUtility { get; set; } = 0;
+
+    public Option(ActionObject main, IntermediaryAction intermediary)
+    {
+        Intermediary = intermediary;
+        Main = main;
+    }
+
+    public Option(ActionObject action)
+    {
+        Main = action;
+    }
+
+    public void Use(PetAgent agent)
+    {
+        if (Intermediary != null)
+            Intermediary.Use(agent);
+        else
+            Main.Use(agent);
+    }
+
+    public ActionStatus GetStatus()
+    {
+        var intermediaryStatus = Intermediary?.Status ?? ActionStatus.Completed;
+        if (intermediaryStatus == ActionStatus.Ongoing || Main.Status == ActionStatus.Ongoing)
+            return ActionStatus.Ongoing;
+        else if (intermediaryStatus == ActionStatus.Completed && Main.Status == ActionStatus.Completed)
+            return ActionStatus.Completed;
+        else
+            return ActionStatus.Inactive;
+    }
+
+    public ActionObject GetCurrentAction()
+    {
+        if (Main.Status == ActionStatus.Ongoing || 
+            Main.Status == ActionStatus.Completed || 
+            Intermediary == null)
+            return Main;
+        return Intermediary;
     }
 }

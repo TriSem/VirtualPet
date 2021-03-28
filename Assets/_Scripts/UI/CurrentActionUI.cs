@@ -13,14 +13,14 @@ public class CurrentActionUI : MonoBehaviour
 
     void Update()
     {
-        if(actionSelection.CurrentAction == null)
+        if(actionSelection.CurrentOption == null)
         {
             text.text = "No Action";
         }
         else
         {
-            string currentAction = actionSelection.CurrentAction.ToString();
-            text.text = currentAction + ": " + actionSelection.CurrentUtility.ToString("F2");
+            string currentAction = actionSelection.CurrentOption.GetCurrentAction().ToString();
+            text.text = currentAction + ": " + actionSelection.CurrentOption.TotalUtility.ToString("F2");
         }
     }
 }
