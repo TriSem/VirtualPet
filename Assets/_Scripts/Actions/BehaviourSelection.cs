@@ -5,17 +5,17 @@ public class BehaviourSelection : MonoBehaviour
 {
     [SerializeField] PetAgent agent = default;
     [SerializeField] Transform internalActionSet = default;
-    [SerializeField] ActionObject fallbackBehavior = default;
+    [SerializeField] IntermediaryAction fallbackBehavior = default;
     [SerializeField] float commandBonus;
 
     HashSet<string> commandedActions = new HashSet<string>();
 
-    List<ActionObject> internalActions = default;
+    List<IntermediaryAction> internalActions = default;
     public Option CurrentOption { get; private set; } = default;
 
     void Start()
     {
-        internalActions = new List<ActionObject>(internalActionSet.GetComponents<ActionObject>());
+        internalActions = new List<IntermediaryAction>(internalActionSet.GetComponents<IntermediaryAction>());
         CurrentOption = new Option(fallbackBehavior);
         CurrentOption.Use(agent);
     }
@@ -158,7 +158,10 @@ public class Option
     public void Use(PetAgent agent)
     {
         if (Intermediary != null)
+        {
+            Intermediary.SetFollowUp(Main);
             Intermediary.Use(agent);
+        }
         else
             Main.Use(agent);
     }
