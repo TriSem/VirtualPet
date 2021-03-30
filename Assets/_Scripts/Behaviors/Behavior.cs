@@ -7,18 +7,11 @@ public abstract class Behavior : MonoBehaviour, IBehaviour
     [SerializeField] 
     protected List<Outcome> outcomes = null;
     
-    [SerializeField] 
-    protected float priorityBonus = 0f;
-
-    // A bonus to the actions utility. Can be used to
-    // simulate reflexes.
-    public float PriorityBonus => priorityBonus;
-
     public BehaviorState Status { get; protected set; } = BehaviorState.Inactive;
 
     public virtual bool PreconditionsMet(InternalModel internalModel) => true;
 
-    public  float CalculateUtility(DriveVector drives) => drives.CalculateUtility(outcomes) + priorityBonus;
+    public  float CalculateUtility(DriveVector drives) => drives.CalculateUtility(outcomes);
 
     public abstract void Use(PetAgent agent);
 

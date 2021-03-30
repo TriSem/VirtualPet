@@ -9,6 +9,7 @@ public class BehaviourSelection : MonoBehaviour
     [SerializeField] float commandBonus;
 
     HashSet<string> commandedBehaviors = new HashSet<string>();
+    Dictionary<string, float> behaviorBoni = new Dictionary<string, float>();
 
     List<Behavior> internalBehaviors = default;
     public Option CurrentOption { get; private set; } = default;
@@ -88,13 +89,13 @@ public class BehaviourSelection : MonoBehaviour
                 CullBelowUtility(CurrentOption.TotalUtility, options);
             }
 
-            int index = Random.Range(0, options.Count - 1);
-            CurrentOption = options[index];
+            // int index = Random.Range(0, options.Count - 1);
+            CurrentOption = options[0];
             CurrentOption.Use(agent);
         }
     }
 
-    public List<Behavior> EnabledBehaviors(List<Behavior> previouslyImpossible, InternalModel predictedModel)
+    List<Behavior> EnabledBehaviors(List<Behavior> previouslyImpossible, InternalModel predictedModel)
     {
         var nowPossible = new List<Behavior>();
         foreach(var behavior in previouslyImpossible)
@@ -105,19 +106,22 @@ public class BehaviourSelection : MonoBehaviour
         return nowPossible;
     }
 
-    public float TotalUtility(Option option)
+    float TotalUtility(Option option)
     {
-        float utility = option.Main.PriorityBonus + option.Main.CalculateUtility(agent.DriveVector);
-        utility += (option.Intermediary?.CalculateUtility(agent.DriveVector) + option.Intermediary?.PriorityBonus) ?? 0f;
+        float utility = option.Main.CalculateUtility(agent.DriveVector);
+
+        if(option.Intermediary != null)
+            utility += option.Intermediary.CalculateUtility(agent.DriveVector);
 
         // Grant a bonus if the behavior was commanded by the player.
         string behaviorName = option.Main.GetType().Name;
         utility += commandedBehaviors.Contains(behaviorName) ? commandBonus : 0f;
+        utility += behaviorBoni.ContainsKey(behaviorName) ? behaviorBoni[behaviorName] : 0f;
 
         return utility;
     }
 
-    public void CullBelowUtility(float utilityThreshold, List<Option> options)
+    void CullBelowUtility(float utilityThreshold, List<Option> options)
     {
         for (int i = options.Count - 1; i > 0; i--)
         {
@@ -135,6 +139,20 @@ public class BehaviourSelection : MonoBehaviour
     public void StopCommanding(string behaviorName)
     {
         commandedBehaviors.Remove(behaviorName);
+    }
+
+    // Give a custom bonus to the utility of the named behavior.
+    public void GiveBonus(string behaviorName, float bonus)
+    {
+        if (!behaviorBoni.ContainsKey(behaviorName))
+            behaviorBoni.Add(behaviorName, bonus);
+        else
+            behaviorBoni[behaviorName] = bonus;
+    }
+
+    public void RemoveBonus(string behaviorName)
+    {
+        behaviorBoni.Remove(behaviorName);
     }
 }
 

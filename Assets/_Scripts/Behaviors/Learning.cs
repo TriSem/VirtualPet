@@ -5,21 +5,22 @@ using UnityEngine;
 public class Learning : MonoBehaviour
 {
     [SerializeField, Tooltip("Actions that can be associated with a command.")]
-    List<LearnableAction> learnables = null;
+    List<LearnableBehavior> learnables = null;
     [SerializeField] BehaviourSelection behaviourSelection = null;
+    [SerializeField] Transform icon;
 
     [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
     float commandDuration = 3;
 
-    Dictionary<string, LearnableAction> learnableActions = new Dictionary<string, LearnableAction>();
-    List<Tuple<LearnableAction, float>> recentlyHeard = new List<Tuple<LearnableAction, float>>();
-    LearnableAction currentlyLearning = null;
+    Dictionary<string, LearnableBehavior> learnableBehaviors = new Dictionary<string, LearnableBehavior>();
+    List<Tuple<LearnableBehavior, float>> recentlyHeard = new List<Tuple<LearnableBehavior, float>>();
+    LearnableBehavior currentlyLearning = null;
 
-    void Start()
+    void Awake()
     {
         foreach(var learnable in learnables)
         {
-            learnableActions.Add(name, new LearnableAction(learnable.ActionName));
+            learnableBehaviors.Add(learnable.Name, learnable);
         }
     }
 
@@ -29,7 +30,7 @@ public class Learning : MonoBehaviour
         foreach (var tuple in recentlyHeard)
         {
             if (Time.time >= tuple.Item2)
-                behaviourSelection.StopCommanding(tuple.Item1.ActionName);
+                behaviourSelection.StopCommanding(tuple.Item1.Name);
         }
     }
 
@@ -37,42 +38,48 @@ public class Learning : MonoBehaviour
     {
         if (currentlyLearning != null)
         {
-            var action = learnableActions[currentlyLearning.ActionName];
+            var action = learnableBehaviors[currentlyLearning.Name];
             action.PhraseRecognized(phrase);
         }
         else
         {
-            foreach (var entry in learnableActions)
+            foreach (var entry in learnableBehaviors)
             {
                 if (entry.Value.AssociatedPhrase == phrase)
                 {
-                    recentlyHeard.Add(new Tuple<LearnableAction, float>(entry.Value, Time.time + commandDuration));
-                    behaviourSelection.StartCommanding(entry.Value.ActionName);
+                    recentlyHeard.Add(new Tuple<LearnableBehavior, float>(entry.Value, Time.time + commandDuration));
+                    behaviourSelection.StartCommanding(entry.Value.Name);
                 }
             }
         }
     }
+
+    public void StartLearning(string behaviorName)
+    {
+        icon.gameObject.SetActive(true);
+        currentlyLearning = learnableBehaviors[behaviorName];
+    }
+
+    public void StopLearning()
+    {
+        icon.gameObject.SetActive(false);
+        currentlyLearning = null;
+    }
 }
 
 [Serializable]
-public class LearnableAction
+public class LearnableBehavior
 {
     const string None = "None";
-    [SerializeField] string actionName;
+    [SerializeField] string name;
     [SerializeField] int minSampleSize = 5;
     [SerializeField] float minAccuracy = 0.75f;
     int sampleSize = 0;
 
     public string AssociatedPhrase { get; private set; } = None;
 
-    public string ActionName { get; private set; }
-    Dictionary<string, int> phraseCountPairs;
-
-    public LearnableAction(string actionName)
-    {
-        ActionName = actionName;
-        phraseCountPairs = new Dictionary<string, int>();
-    }
+    public string Name => name;
+    Dictionary<string, int> phraseCountPairs = new Dictionary<string, int>();
 
     public void PhraseRecognized(string phrase)
     {

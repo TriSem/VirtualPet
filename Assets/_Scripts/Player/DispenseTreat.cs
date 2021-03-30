@@ -4,13 +4,13 @@ public class DispenseTreat : MonoBehaviour
 {
     [SerializeField] Transform treatPrefab = default;
     [SerializeField] Transform cursor = default;
-    Edible instance = null;
+    EatTreat instance = null;
 
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Mouse1) && instance == null)
         {
-            instance = Instantiate(treatPrefab, cursor).GetComponent<Edible>();
+            instance = Instantiate(treatPrefab, cursor).GetComponent<EatTreat>();
             instance.transform.localPosition = Vector3.zero;
             instance.GetComponent<Rigidbody>().isKinematic = true;
             instance.enabled = false;
