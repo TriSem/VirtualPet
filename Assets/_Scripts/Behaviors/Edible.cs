@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Edible : ActionObject
+public class Edible : Behavior
 {
     PetAgent agent = null;
 
@@ -12,13 +12,13 @@ public class Edible : ActionObject
 
     public override void Cancel()
     {
-        Status = ActionStatus.Inactive;
+        Status = BehaviorState.Inactive;
     }
 
     public override void Use(PetAgent agent)
     {
         this.agent = agent;
-        Status = ActionStatus.Ongoing;
+        Status = BehaviorState.Ongoing;
     }
 
     void GetEaten()
@@ -31,7 +31,7 @@ public class Edible : ActionObject
 
     void Update()
     {
-        if(Status == ActionStatus.Ongoing)
+        if(Status == BehaviorState.Ongoing)
         {
             if (interaction.PetInRange)
                 GetEaten();

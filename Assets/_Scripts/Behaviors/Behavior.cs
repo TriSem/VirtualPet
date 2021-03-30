@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ActionObject : MonoBehaviour, IBehaviour
+public abstract class Behavior : MonoBehaviour, IBehaviour
 {
     // Predicts how the pets drives will change when using this action.
     [SerializeField] 
@@ -14,7 +14,7 @@ public abstract class ActionObject : MonoBehaviour, IBehaviour
     // simulate reflexes.
     public float PriorityBonus => priorityBonus;
 
-    public ActionStatus Status { get; protected set; } = ActionStatus.Inactive;
+    public BehaviorState Status { get; protected set; } = BehaviorState.Inactive;
 
     public virtual bool PreconditionsMet(InternalModel internalModel) => true;
 
@@ -25,7 +25,7 @@ public abstract class ActionObject : MonoBehaviour, IBehaviour
     public abstract void Cancel();
 }
 
-public enum ActionStatus
+public enum BehaviorState
 {
     Inactive,
     Ongoing,
@@ -38,17 +38,17 @@ public interface IPhysicsObject
     Collider Collider { get; }
 }
 
-public abstract class IntermediaryAction : ActionObject
+public abstract class IntermediaryBehavior : Behavior
 {
-    protected ActionObject followUp;
+    protected Behavior followUp;
 
     public abstract HashSet<InternalState> GetPredictedChanges();
 
-    public void SetFollowUp(ActionObject followUp) => this.followUp = followUp;
+    public void SetFollowUp(Behavior followUp) => this.followUp = followUp;
 
     protected void Transition(PetAgent agent)
     {
-        Status = ActionStatus.Completed;
+        Status = BehaviorState.Completed;
         if (followUp == null)
             return;
 

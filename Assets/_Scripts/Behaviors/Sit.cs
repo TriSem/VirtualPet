@@ -1,10 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class Sit : ActionObject, IAudioReciever
+public class Sit : Behavior, IAudioReciever
 {
-    [SerializeField, Range(0, 100)]
-    int learnedAfterRepitition = 10;
-
     [SerializeField, Range(1f, 100f)]
     float minimumSitTime = 1f;
 
@@ -16,23 +14,15 @@ public class Sit : ActionObject, IAudioReciever
 
     bool learned = false;
     bool learningEnabled = false;
-    float stopSittingTime = 0f;
-
-    int reinforcementCount = 0;
 
     [SerializeField] Transform icon = null;
     [SerializeField] AudioHub audioHub = null;
 
+    TimerCondition timerCondition = new TimerCondition(0f);
+
     public override void Cancel()
     {
-        if(!learned)
-        {
-            icon.gameObject.SetActive(false);
-            learningEnabled = false;
-        }
-
-        // TODO: Play getup animation.
-        Status = ActionStatus.Inactive;
+        
     }
 
     public void RecieveSignal(Command command)
@@ -43,39 +33,49 @@ public class Sit : ActionObject, IAudioReciever
         }
         if (learningEnabled && command == Command.Sit)
         {
-            reinforcementCount++;
-            if (reinforcementCount >= learnedAfterRepitition)
-                learned = true;
         }
     }
 
     void Start()
     {
         audioHub.Register(this);
+
+        var exit = new ExitState();
+        var sit = new SitState();
+        var toExit = new Transition(exit, timerCondition);
+
+        sit.Transitions.Add(toExit);
     }
 
     public override void Use(PetAgent agent)
     {
-        Status = ActionStatus.Ongoing;
+        Status = BehaviorState.Ongoing;
         if(!learned)
         {
             learningEnabled = true;
             icon.gameObject.SetActive(true);
         }
 
-        stopSittingTime = Time.time + Random.Range(minimumSitTime, maximumSitTime);
-
-        // TODO: Play sitting animation
+        var timer = 
+        sit.Transitions = new Transition();
     }
 
     void Update()
     {
-        if (tagTrigger.Triggered)
-
-        if(Status == ActionStatus.Ongoing)
-        {
-            if (Time.time > stopSittingTime)
-                Cancel();
-        }
+        
     }
 }
+
+public class SitState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.SitDown();
+    }
+
+    public override void OnExit(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.GetUp();
+    }
+}
+

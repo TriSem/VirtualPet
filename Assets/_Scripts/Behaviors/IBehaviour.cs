@@ -1,6 +1,6 @@
 ﻿public interface IBehaviour
 {
-    ActionStatus Status { get; }
+    BehaviorState Status { get; }
     void Use(PetAgent agent);
     void Cancel();
 }

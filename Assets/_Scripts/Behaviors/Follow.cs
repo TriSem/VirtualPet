@@ -1,17 +1,17 @@
-﻿public class Follow : ActionObject
+﻿public class Follow : Behavior
 {
     PetAgent agent = null;
 
     public override void Cancel()
     {
-        Status = ActionStatus.Inactive;
+        Status = BehaviorState.Inactive;
         agent.Motor.Stop();
     }
 
     public override void Use(PetAgent agent)
     {
         this.agent= agent;
-        Status = ActionStatus.Ongoing;
+        Status = BehaviorState.Ongoing;
         agent.Motor.Follow(transform);
     }
 
