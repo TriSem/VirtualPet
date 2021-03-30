@@ -24,6 +24,7 @@ public class BehaviourSelection : MonoBehaviour
     public void EvaluateBehaviors()
     {
         var model = new InternalModel(agent.InternalModel);
+        List<Option> options = new List<Option>();
 
         var percievedObjects = agent.Perception.Poll();
         var allBehaviors = new List<Behavior>(internalBehaviors);
@@ -32,8 +33,6 @@ public class BehaviourSelection : MonoBehaviour
 
         var possibleBehaviors = new List<Behavior>();
         var impossibleBehaviors = new List<Behavior>();
-
-        List<Option> options = new List<Option>();
 
         foreach(var behavior in allBehaviors)
         {
@@ -77,16 +76,10 @@ public class BehaviourSelection : MonoBehaviour
             {
                 return;
             }
-
             if (behaviorStatus == BehaviorState.Inactive || behaviorStatus == BehaviorState.Completed)
             {
                 // Select several reasonable options to randomly choose from.
                 CullBelowUtility(highestUtility * 0.9f, options);
-            }
-            else
-            {
-                // Ongoing abilities should only be interrupted if they are suboptimal.
-                CullBelowUtility(CurrentOption.TotalUtility * 1.2f, options);
             }
 
             // int index = Random.Range(0, options.Count - 1);

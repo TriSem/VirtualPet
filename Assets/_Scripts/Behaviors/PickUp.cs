@@ -29,9 +29,8 @@ public class PickUp : IntermediaryBehavior
     {
         var pursue = new PursueState();
         var grab = new GrabState();
-        var exit = new ExitState();
         var toGrab = new Transition(grab, new InteractionCondition(interaction));
-        var toExit = new Transition(exit, new MetCondition());
+        var toExit = new Transition(PetState.ExitState, new MetCondition());
 
         pursue.Transitions.Add(toGrab);
         grab.Transitions.Add(toExit);

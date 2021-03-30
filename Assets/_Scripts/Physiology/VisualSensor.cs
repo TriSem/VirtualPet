@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class VisualSensor : Sensor
 {
-    [SerializeField] Perception perception = null;
     [SerializeField] float minimumSignalStrength = 1f;
     [SerializeField] float maximumViewDistance = 20f;
     [SerializeField] float visionAngle = 45f;
@@ -30,7 +29,7 @@ public class VisualSensor : Sensor
             Vector3.Angle(transform.forward, delta) > visionAngle)
             return false;
 
-        return worldObject.Visibility * Mathf.Pow(attenuation, distance) >= 1f;
+        return worldObject.Visibility * Mathf.Pow(attenuation, distance) >= minimumSignalStrength;
     }
 
     void Start()

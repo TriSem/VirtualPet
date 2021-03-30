@@ -5,6 +5,7 @@ using UnityEngine.AI;
 public class MotorSystem : MonoBehaviour
 {
     [SerializeField] NavMeshAgent navAgent = null;
+    [SerializeField] Animator animator = null;
     [SerializeField] PetAgent agent = null;
     [SerializeField] float baseSpeed = 3f;
     [SerializeField] float maximumSpeed = 6f;
@@ -26,49 +27,17 @@ public class MotorSystem : MonoBehaviour
 
     void Update()
     {
-        LimitCurrentSpeed();
         if(!stopped)
         {
             navAgent.destination = currentBehavior.Destination();
         }
     }
 
-    public void RequestSpeed(float speed)
-    {
-        float limit = DetermineSpeedLimit();
-        navAgent.speed = Mathf.Clamp(speed, 0, limit);
-        AdjustAngularSpeed();
-    }
-
-    float DetermineSpeedLimit()
-    {
-        float limit = baseSpeed;
-        return Mathf.Max(baseSpeed, limit);
-    }
-
-    /// <summary>
-    /// Adjusts angular speed to use the same percentage of the maximum
-    /// as regular speed.
-    /// </summary>
-    void AdjustAngularSpeed()
-    {
-        float percentage = (navAgent.speed - baseSpeed) * 100 / (maximumSpeed - baseSpeed);
-        navAgent.angularSpeed = baseAngularSpeed
-            + (maximumAngularSpeed - baseAngularSpeed)
-            * percentage
-            / 100;
-    }
-
-    void LimitCurrentSpeed()
-    {
-        float limit = DetermineSpeedLimit();
-        navAgent.speed = Mathf.Min(navAgent.speed, limit);
-        AdjustAngularSpeed();   
-    }
-
     public void Pursue(Transform target, float pursueLead)
     {
         stopped = false;
+        navAgent.speed = maximumSpeed;
+        navAgent.angularSpeed = maximumAngularSpeed;
         navAgent.updateRotation = true;
         navAgent.updatePosition = true;
         currentBehavior = new Pursuit(target, pursueLead);
@@ -77,6 +46,8 @@ public class MotorSystem : MonoBehaviour
     public void Wander()
     {
         stopped = false;
+        navAgent.speed = baseSpeed;
+        navAgent.angularSpeed = baseAngularSpeed;
         navAgent.updateRotation = true;
         navAgent.updatePosition = true;
         currentBehavior = new WanderSteer(navAgent.transform);
@@ -85,6 +56,8 @@ public class MotorSystem : MonoBehaviour
     public void Follow(Transform target)
     {
         stopped = false;
+        navAgent.speed = baseSpeed;
+        navAgent.angularSpeed = baseAngularSpeed;
         navAgent.updateRotation = true;
         navAgent.updatePosition = true;
         currentBehavior = new Pursuit(target, 0f);
@@ -101,7 +74,7 @@ public class MotorSystem : MonoBehaviour
     {
         stopped = true;
         agent.InternalModel.Add(InternalState.Sitting);
-        // TODO: Play sit animation.
+        animator.SetBool("Sitting", true);
     }
 
     public void LieDown()
@@ -116,12 +89,14 @@ public class MotorSystem : MonoBehaviour
         // TODO: Play getup animation.
         agent.InternalModel.Remove(InternalState.Sitting);
         agent.InternalModel.Remove(InternalState.LyingDown);
+        animator.SetBool("Sitting", false);
         stopped = false;
     }
 
     public void Stop()
     {
         navAgent.ResetPath();
+        currentBehavior = new WanderSteer(transform);
         stopped = true;
     }
 }

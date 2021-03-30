@@ -8,6 +8,10 @@ public class EatTreat : Behavior
     [SerializeField] float timeToChew = 2f;
 
     [SerializeField] Interaction interaction = default;
+    [SerializeField] Material highlightMaterial = default;
+
+    MeshRenderer renderer= null;
+    Material originalMaterial = null;
 
     public bool Eaten { get; set; } = false;
 
@@ -21,16 +25,23 @@ public class EatTreat : Behavior
         stateMachine.Stop();
         if (Eaten)
             Destroy(gameObject);
+        renderer.material = originalMaterial;
     }
 
     public override void Use(PetAgent agent)
     {
         Status = BehaviorState.Ongoing;
+        if (stateMachine == null)
+            Debug.Log("Null");
         stateMachine.Start(agent, this);
+        renderer.material = highlightMaterial;
     }
 
-    void Start()
+    void Awake()
     {
+        renderer = GetComponent<MeshRenderer>();
+        originalMaterial = renderer.material;
+        
         var moving = new PursueState();
         var eating = new EatingTreatState(timeToChew);
         var interactionCondition = new InteractionCondition(interaction);
@@ -65,7 +76,8 @@ public class EatingTreatState : PetState
     {
         agent.Motor.Stop();
         // TODO: Start chewing animation.
-        agent.Snoot.Carry(behavior);
+        agent.Mouth.Carry(behavior);
+        agent.Mjam();
         TimerCondition.StopTime = timeToChew + Time.time;
         Debug.Log("Start eating.");
     }
@@ -76,6 +88,6 @@ public class EatingTreatState : PetState
         EatTreat eat = behavior as EatTreat;
         agent.Stomach.ChangeFill(eat.FillValue);
         eat.Eaten = true;
-        agent.Snoot.Release();
+        agent.Mouth.Release();
     }
 }

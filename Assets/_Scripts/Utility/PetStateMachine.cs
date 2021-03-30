@@ -106,7 +106,7 @@ public class PlayAndWander : PetState
     public override void OnEntry(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Wander();
-        agent.Snoot.Carry(behavior);
+        agent.Mouth.Carry(behavior);
         nextShakeTime = Time.time + Random.Range(1f, 5f);
         Debug.Log("Enter play and wander.");
     }
@@ -114,7 +114,7 @@ public class PlayAndWander : PetState
     public override void OnExit(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Stop();
-        agent.Snoot.Release();
+        agent.Mouth.Release();
         Debug.Log("Leave play and wander.");
     }
 
@@ -148,7 +148,7 @@ public class GrabState : PetState
 {
     public override void OnEntry(PetAgent agent, Behavior behavior)
     {
-        agent.Snoot.Carry(behavior);
+        agent.Mouth.Carry(behavior);
     }
 }
 
@@ -169,6 +169,6 @@ public class DropState : PetState
 {
     public override void OnEntry(PetAgent agent, Behavior behavior)
     {
-        agent.Snoot.Release();
+        agent.Mouth.Release();
     }
 }
