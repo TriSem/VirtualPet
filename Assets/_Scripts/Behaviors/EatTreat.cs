@@ -2,8 +2,6 @@
 
 public class EatTreat : Behavior
 {
-    PetAgent agent = null;
-
     [SerializeField, Range(0f, 1000f)] 
     float fillValue = 5f;
 
@@ -20,14 +18,15 @@ public class EatTreat : Behavior
     public override void Cancel()
     {
         Status = BehaviorState.Completed;
+        stateMachine.Stop();
         if (Eaten)
             Destroy(gameObject);
     }
 
     public override void Use(PetAgent agent)
     {
-        this.agent = agent;
         Status = BehaviorState.Ongoing;
+        stateMachine.Start(agent, this);
     }
 
     void Start()

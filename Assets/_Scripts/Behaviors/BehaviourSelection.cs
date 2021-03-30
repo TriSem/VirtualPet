@@ -86,7 +86,7 @@ public class BehaviourSelection : MonoBehaviour
             else
             {
                 // Ongoing abilities should only be interrupted if they are suboptimal.
-                CullBelowUtility(CurrentOption.TotalUtility, options);
+                CullBelowUtility(CurrentOption.TotalUtility * 1.2f, options);
             }
 
             // int index = Random.Range(0, options.Count - 1);

@@ -3,11 +3,11 @@
 public class Grasp : MonoBehaviour
 {
     [SerializeField] PetAgent agent = null;
-    ActionObject carried = null;
+    Behavior carried = null;
 
     public bool Carrying => carried != null;
 
-    public void Carry(ActionObject actionObject)
+    public void Carry(Behavior actionObject)
     {
         if (Carrying)
             Release();

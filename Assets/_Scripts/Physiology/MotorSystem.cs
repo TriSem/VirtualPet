@@ -5,6 +5,7 @@ using UnityEngine.AI;
 public class MotorSystem : MonoBehaviour
 {
     [SerializeField] NavMeshAgent navAgent = null;
+    [SerializeField] PetAgent agent = null;
     [SerializeField] float baseSpeed = 3f;
     [SerializeField] float maximumSpeed = 6f;
     [SerializeField] float baseAngularSpeed = 135f;
@@ -12,11 +13,6 @@ public class MotorSystem : MonoBehaviour
     [SerializeField] float baseStoppingDistance = 2f;
 
     bool stopped = true;
-
-    internal void MoveTo(Vector3 position)
-    {
-        throw new NotImplementedException();
-    }
 
     SteeringBehavior currentBehavior = null;
 
@@ -99,6 +95,28 @@ public class MotorSystem : MonoBehaviour
         navAgent.updateRotation = true;
         navAgent.updatePosition = false;
         currentBehavior = new Pursuit(target, 0f);
+    }
+
+    public void SitDown()
+    {
+        stopped = true;
+        agent.InternalModel.Add(InternalState.Sitting);
+        // TODO: Play sit animation.
+    }
+
+    public void LieDown()
+    {
+        stopped = true;
+        agent.InternalModel.Add(InternalState.LyingDown);
+        // TODO: Play lying down animation.
+    }
+
+    public void GetUp()
+    {
+        // TODO: Play getup animation.
+        agent.InternalModel.Remove(InternalState.Sitting);
+        agent.InternalModel.Remove(InternalState.LyingDown);
+        stopped = false;
     }
 
     public void Stop()

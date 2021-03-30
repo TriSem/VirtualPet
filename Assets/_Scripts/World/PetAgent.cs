@@ -10,23 +10,25 @@ public class PetAgent : MonoBehaviour
     [SerializeField] Perception perception = null;
     [SerializeField] Stomach stomach = null;
     [SerializeField] Grasp snoot = null;
-    BehaviourSelection actionSelection = null;
+    [SerializeField] Learning learning = null;
+
+    public BehaviourSelection BehaviourSelection { get; private set; } = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
     public InternalModel InternalModel { get; private set; } = new InternalModel();
-
     public Stomach Stomach => stomach;
     public Perception Perception => perception;
     public DriveVector DriveVector { get; } = new DriveVector();
     public MotorSystem Motor => motorSystem;
     public Grasp Snoot => snoot;
+    public Learning Learning => learning;
 
     float lastTick = (1 / 5);
 
     void Awake()
     {
         BoundingBox = GetComponent<BoxCollider>();
-        actionSelection = GetComponent<BehaviourSelection>();
+        BehaviourSelection = GetComponent<BehaviourSelection>();
     }
 
     void Update()
@@ -35,7 +37,7 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
-            actionSelection.EvaluateActions();
+            BehaviourSelection.EvaluateBehaviors();
         }
     }
 }

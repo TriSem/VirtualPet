@@ -6,14 +6,14 @@ public class TagTrigger : MonoBehaviour
 
     public bool Triggered { get; private set; }
 
-    void FixedUpdate()
-    {
-        Triggered = false;    
-    }
-
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(tagName))
             Triggered = true;
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        Triggered = false;    
     }
 }

@@ -1,25 +1,27 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PetStateMachine
 {
+
     PetState initialState;
     PetState currentState;
     PetAgent agent;
-    ActionObject actionObject;
+    Behavior behavior;
     bool running = false;
 
-    public void Start(PetAgent agent, ActionObject actionObject)
+    public void Start(PetAgent agent, Behavior behavior)
     {
         running = true;
         currentState = initialState;
-        currentState.OnEntry(agent, actionObject);
+        currentState.OnEntry(agent, behavior);
         this.agent = agent;
-        this.actionObject = actionObject;
+        this.behavior = behavior;
     }
 
     public void Stop()
     {
-        currentState.OnExit(agent, actionObject);
+        currentState.OnExit(agent, behavior);
         running = false;
     }
 
@@ -30,12 +32,12 @@ public class PetStateMachine
 
         if(currentState.StateChanged(out PetState newState))
         {
-            currentState.OnExit(agent, actionObject);
+            currentState.OnExit(agent, behavior);
             currentState = newState;
-            currentState.OnEntry(agent, actionObject);
+            currentState.OnEntry(agent, behavior);
         }
 
-        currentState.OnUpdate(agent, actionObject);
+        currentState.OnUpdate(agent, behavior);
     }
 
     public PetStateMachine(PetState initialState)
@@ -46,6 +48,8 @@ public class PetStateMachine
 
 public abstract class PetState
 {
+    public static readonly ExitState ExitState = new ExitState();
+
     public List<Transition> Transitions { get; private set; } = new List<Transition>();
 
     public bool StateChanged(out PetState newState)
@@ -63,15 +67,17 @@ public abstract class PetState
         return false;
     }
 
-    public abstract void OnEntry(PetAgent agent, ActionObject actionObject);
+    public virtual void OnEntry(PetAgent agent, Behavior behavior) { }
 
-    public abstract void OnExit(PetAgent agent, ActionObject actionObject);
+    public virtual void OnExit(PetAgent agent, Behavior behavior) { }
 
-    public abstract void OnUpdate(PetAgent agent, ActionObject actionObject);
+    public virtual void OnUpdate(PetAgent agent, Behavior behavior) { }
 }
+
 
 public class Transition
 {
+
     ICondition condition;
 
     public PetState TargetState { get; private set; }
@@ -87,16 +93,82 @@ public class Transition
 
 public class ExitState : PetState
 {
-    public override void OnEntry(PetAgent agent, ActionObject actionObject)
+    public override void OnEntry(PetAgent agent, Behavior behavior)
     {
-        actionObject.Cancel();
+        behavior.Cancel();
+    }
+}
+
+public class PlayAndWander : PetState
+{
+    float nextShakeTime;
+
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Wander();
+        agent.Snoot.Carry(behavior);
+        nextShakeTime = Time.time + Random.Range(1f, 5f);
+        Debug.Log("Enter play and wander.");
     }
 
-    public override void OnExit(PetAgent agent, ActionObject actionObject)
+    public override void OnExit(PetAgent agent, Behavior behavior)
     {
+        agent.Motor.Stop();
+        agent.Snoot.Release();
+        Debug.Log("Leave play and wander.");
     }
 
-    public override void OnUpdate(PetAgent agent, ActionObject actionObject)
+    public override void OnUpdate(PetAgent agent, Behavior behavior)
     {
+        float time = Time.time;
+        if (time > nextShakeTime)
+        {
+            // Play shake animation
+            nextShakeTime = time + Random.Range(1f, 5f);
+        }
+    }
+}
+
+public class PursueState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Pursue(behavior.transform, 0f);
+        Debug.Log("Enter pursuit.");
+    }
+
+    public override void OnExit(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Stop();
+        Debug.Log("Leave pursuit.");
+    }
+}
+
+public class GrabState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Snoot.Carry(behavior);
+    }
+}
+
+public class FollowState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Follow(behavior.transform);
+    }
+
+    public override void OnExit(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Stop();
+    }
+}
+
+public class DropState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Snoot.Release();
     }
 }

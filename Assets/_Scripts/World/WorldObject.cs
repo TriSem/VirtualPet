@@ -9,23 +9,23 @@ public sealed class WorldObject : MonoBehaviour
     [SerializeField] float audibility = 0f;
     [SerializeField] float smelliness = 0f;
 
-    Rigidbody rigidBody;
+    Rigidbody rigidbody;
 
     public string Name => objectName;
     public float Visibility => visibility;
     public float Audibility => audibility;
     public float Smelliness => smelliness;
 
-    public Vector3 Velocity => rigidBody?.velocity ?? Vector3.zero;
+    public Vector3 Velocity => rigidbody == null ? Vector3.zero : rigidbody.velocity;
 
-    public List<ActionObject> Actions { get; private set; }
+    public List<Behavior> Behaviors { get; private set; }
 
     void Awake() => WorldBlackboard.Instance.Add(this);    
 
     void Start()
     {
-        Actions = new List<ActionObject>(GetComponents<ActionObject>());
-        rigidBody = GetComponent<Rigidbody>();
+        Behaviors = new List<Behavior>(GetComponents<Behavior>());
+        rigidbody = GetComponent<Rigidbody>();
     }
 
     void OnEnable() => WorldBlackboard.Instance.Add(this);

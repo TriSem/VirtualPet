@@ -43,7 +43,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.9
+  m_Radius: 1.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2432932613953017158
 MonoBehaviour:
@@ -172,7 +172,7 @@ MonoBehaviour:
   - drive: 0
     value: 1
   fillValue: 5
-  refillable: 0
+  timeToChew: 2
   interaction: {fileID: 2432932613953017158}
 --- !u!114 &7575444943423209433
 MonoBehaviour:
@@ -190,7 +190,6 @@ MonoBehaviour:
   visibility: 1
   audibility: 0
   smelliness: 1
-  isStatic: 0
 --- !u!54 &-9206998629554851891
 Rigidbody:
   m_ObjectHideFlags: 0
