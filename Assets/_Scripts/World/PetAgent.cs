@@ -88,5 +88,6 @@ public enum InternalState
     Carrying,
     Sitting,
     LyingDown,
-    BeingPet
+    BeingPet,
+    InBed
 }

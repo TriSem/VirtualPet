@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class Wander : Behavior
+﻿public class Wander : Behavior
 {
     MotorSystem motor = null;
 

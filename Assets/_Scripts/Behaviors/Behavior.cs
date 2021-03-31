@@ -21,32 +21,11 @@ public abstract class Behavior : MonoBehaviour, IBehaviour
 public enum BehaviorState
 {
     Inactive,
-    Ongoing,
-    Completed
+    Ongoing
 }
 
 public interface IPhysicsObject
 {
     Rigidbody Rigidbody { get; }
     Collider Collider { get; }
-}
-
-public abstract class IntermediaryBehavior : Behavior
-{
-    protected Behavior followUp;
-
-    public abstract HashSet<InternalState> GetPredictedChanges();
-
-    public void SetFollowUp(Behavior followUp) => this.followUp = followUp;
-
-    protected void Transition(PetAgent agent)
-    {
-        Status = BehaviorState.Completed;
-        if (followUp == null)
-            return;
-
-        if (followUp.PreconditionsMet(agent.InternalModel))
-            followUp.Use(agent);
-        followUp = null;
-    }
 }

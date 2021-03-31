@@ -45,11 +45,11 @@ public class NotCondition : ICondition
 
 public class DestinationCondition : ICondition
 {
-    NavMeshAgent agent;
+    MotorSystem motor;
 
-    public DestinationCondition(NavMeshAgent agent) => this.agent = agent;
+    public DestinationCondition(MotorSystem motor) => this.motor = motor;
 
-    public bool Met => agent.remainingDistance <= agent.stoppingDistance;
+    public bool Met => motor.AtDestination();
 }
 
 public class InteractionCondition : ICondition

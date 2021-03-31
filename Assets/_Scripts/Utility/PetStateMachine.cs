@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PetStateMachine
 {
-
     PetState initialState;
     PetState currentState;
     PetAgent agent;
@@ -108,14 +107,12 @@ public class PlayAndWander : PetState
         agent.Motor.Wander();
         agent.Mouth.Carry(behavior);
         nextShakeTime = Time.time + Random.Range(1f, 5f);
-        Debug.Log("Enter play and wander.");
     }
 
     public override void OnExit(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Stop();
         agent.Mouth.Release();
-        Debug.Log("Leave play and wander.");
     }
 
     public override void OnUpdate(PetAgent agent, Behavior behavior)
@@ -134,13 +131,11 @@ public class PursueState : PetState
     public override void OnEntry(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Pursue(behavior.transform, 0f);
-        Debug.Log("Enter pursuit.");
     }
 
     public override void OnExit(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Stop();
-        Debug.Log("Leave pursuit.");
     }
 }
 
@@ -164,6 +159,20 @@ public class FollowState : PetState
         agent.Motor.Stop();
     }
 }
+
+public class MoveToState : PetState
+{
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.MoveTo(behavior.transform.position);
+    }
+
+    public override void OnExit(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Stop();
+    }
+}
+
 
 public class DropState : PetState
 {

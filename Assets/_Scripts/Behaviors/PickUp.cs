@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PickUp : IntermediaryBehavior
+public class PickUp : Behavior, IIntermediary
 {
     PetStateMachine stateMachine = null;
     [SerializeField] Interaction interaction = null;
@@ -9,10 +9,10 @@ public class PickUp : IntermediaryBehavior
     public override void Cancel()
     {
         stateMachine.Stop();
-        Status = BehaviorState.Completed;
+        Status = BehaviorState.Inactive;
     }
 
-    public override HashSet<InternalState> GetPredictedChanges()
+    public HashSet<InternalState> GetPredictedChanges()
     {
         var changes = new HashSet<InternalState>();
         changes.Add(InternalState.Carrying);

@@ -36,6 +36,7 @@ public class Learning : MonoBehaviour
 
     public void PhraseHeard(string phrase)
     {
+        Debug.Log("Phrase heard.");
         if (currentlyLearning != null)
         {
             var action = learnableBehaviors[currentlyLearning.Name];

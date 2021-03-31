@@ -7,18 +7,18 @@ public class Grasp : MonoBehaviour
 
     public bool Carrying => carried != null;
 
-    public void Carry(Behavior actionObject)
+    public void Carry(Behavior behavior)
     {
         if (Carrying)
             Release();
 
-        if(actionObject is IPhysicsObject physicsObject)
+        if(behavior is IPhysicsObject physicsObject)
         {
             physicsObject.Rigidbody.isKinematic = true;
             physicsObject.Collider.enabled = false;
         }
 
-        carried = actionObject;
+        carried = behavior;
         carried.transform.parent = transform;
         carried.transform.localPosition = Vector3.zero;
         agent.InternalModel.Add(InternalState.Carrying);

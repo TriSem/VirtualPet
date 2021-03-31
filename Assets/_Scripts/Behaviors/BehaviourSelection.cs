@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BehaviourSelection : MonoBehaviour
@@ -12,19 +13,20 @@ public class BehaviourSelection : MonoBehaviour
     Dictionary<string, float> behaviorBoni = new Dictionary<string, float>();
 
     List<Behavior> internalBehaviors = default;
-    public Option CurrentOption { get; private set; } = default;
+    public Behavior CurrentBehavior { get; private set; } = default;
+    public float CurrentUtility { get; private set; } = default;
 
     void Start()
     {
         internalBehaviors = new List<Behavior>(internalBehaviorSet.GetComponents<Behavior>());
-        CurrentOption = new Option(fallbackBehavior);
-        CurrentOption.Use(agent);
+        CurrentBehavior = fallbackBehavior;
+        CurrentBehavior.Use(agent);
     }
 
     public void EvaluateBehaviors()
     {
         var model = new InternalModel(agent.InternalModel);
-        List<Option> options = new List<Option>();
+        List<Tuple<Behavior, float>> candidates = new List<Tuple<Behavior, float>>();
 
         var percievedObjects = agent.Perception.Poll();
         var allBehaviors = new List<Behavior>(internalBehaviors);
@@ -46,11 +48,10 @@ public class BehaviourSelection : MonoBehaviour
         foreach(var behavior in possibleBehaviors)
         {
             // Even intermediaries can be chosen alone.
-            var option = new Option(behavior);
-            option.TotalUtility = TotalUtility(option);
-            options.Add(option);
+            var candidate = behavior;
+            candidates.Add(new Tuple<Behavior, float>(candidate, TotalUtility(candidate)));
 
-            if(behavior is IntermediaryBehavior intermediary)
+            if(behavior is IIntermediary intermediary)
             {
                 // Develop two-step plan.
                 var predictedChanges = intermediary.GetPredictedChanges();
@@ -60,31 +61,30 @@ public class BehaviourSelection : MonoBehaviour
 
                 foreach(var enabledBehavior in enabledBehaviors)
                 {
-                    option = new Option(enabledBehavior, intermediary);
-                    option.TotalUtility = TotalUtility(option);
-                    options.Add(option);
+                    candidates.Add(new Tuple<Behavior, float>(behavior, TotalUtility(enabledBehavior, behavior)));
                 }
             }
         }
 
-        if(options.Count > 0)
+        if(candidates.Count > 0)
         {
-            options.Sort((x, y) => y.TotalUtility.CompareTo(x.TotalUtility));
-            float highestUtility = options[0].TotalUtility;
-            var behaviorStatus = CurrentOption.GetStatus();
-            if (behaviorStatus == BehaviorState.Ongoing && highestUtility <= CurrentOption.TotalUtility)
+            candidates.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            float highestUtility = candidates[0].Item2;
+            var currentStatus = CurrentBehavior.Status;
+            if (currentStatus == BehaviorState.Ongoing && highestUtility <= CurrentUtility)
             {
                 return;
             }
-            if (behaviorStatus == BehaviorState.Inactive || behaviorStatus == BehaviorState.Completed)
+            else
             {
                 // Select several reasonable options to randomly choose from.
-                CullBelowUtility(highestUtility * 0.9f, options);
+                CullBelowUtility(highestUtility * 0.9f, candidates);
             }
 
-            // int index = Random.Range(0, options.Count - 1);
-            CurrentOption = options[0];
-            CurrentOption.Use(agent);
+            int index = UnityEngine.Random.Range(0, candidates.Count - 1);
+            CurrentBehavior = candidates[index].Item1;
+            CurrentUtility = candidates[index].Item2;
+            CurrentBehavior.Use(agent);
         }
     }
 
@@ -99,27 +99,27 @@ public class BehaviourSelection : MonoBehaviour
         return nowPossible;
     }
 
-    float TotalUtility(Option option)
+    float TotalUtility(Behavior candidate, Behavior intermediary = null)
     {
-        float utility = option.Main.CalculateUtility(agent.DriveVector);
+        float utility = candidate.CalculateUtility(agent.DriveVector);
 
-        if(option.Intermediary != null)
-            utility += option.Intermediary.CalculateUtility(agent.DriveVector);
+        if(intermediary != null)
+            utility += intermediary.CalculateUtility(agent.DriveVector);
 
         // Grant a bonus if the behavior was commanded by the player.
-        string behaviorName = option.Main.GetType().Name;
+        string behaviorName = candidate.GetType().Name;
         utility += commandedBehaviors.Contains(behaviorName) ? commandBonus : 0f;
         utility += behaviorBoni.ContainsKey(behaviorName) ? behaviorBoni[behaviorName] : 0f;
 
         return utility;
     }
 
-    void CullBelowUtility(float utilityThreshold, List<Option> options)
+    void CullBelowUtility(float utilityThreshold, List<Tuple<Behavior, float>> candidates)
     {
-        for (int i = options.Count - 1; i > 0; i--)
+        for (int i = candidates.Count - 1; i > 0; i--)
         {
-            if (options[i].TotalUtility < utilityThreshold)
-                options.RemoveAt(i);
+            if (candidates[i].Item2 < utilityThreshold)
+                candidates.RemoveAt(i);
         }
     }
 
@@ -149,51 +149,51 @@ public class BehaviourSelection : MonoBehaviour
     }
 }
 
-public class Option
-{
-    public IntermediaryBehavior Intermediary{ get; private set; } = null;
-    public Behavior Main { get; private set; }
-    public float TotalUtility { get; set; } = 0;
+//public class Option
+//{
+//    public IntermediaryBehavior Intermediary{ get; private set; } = null;
+//    public Behavior Main { get; private set; }
+//    public float TotalUtility { get; set; } = 0;
 
-    public Option(Behavior main, IntermediaryBehavior intermediary)
-    {
-        Intermediary = intermediary;
-        Main = main;
-    }
+//    public Option(Behavior main, IntermediaryBehavior intermediary)
+//    {
+//        Intermediary = intermediary;
+//        Main = main;
+//    }
 
-    public Option(Behavior behavior)
-    {
-        Main = behavior;
-    }
+//    public Option(Behavior behavior)
+//    {
+//        Main = behavior;
+//    }
 
-    public void Use(PetAgent agent)
-    {
-        if (Intermediary != null)
-        {
-            Intermediary.SetFollowUp(Main);
-            Intermediary.Use(agent);
-        }
-        else
-            Main.Use(agent);
-    }
+//    public void Use(PetAgent agent)
+//    {
+//        if (Intermediary != null)
+//        {
+//            Intermediary.SetFollowUp(Main);
+//            Intermediary.Use(agent);
+//        }
+//        else
+//            Main.Use(agent);
+//    }
 
-    public BehaviorState GetStatus()
-    {
-        var intermediaryStatus = Intermediary?.Status ?? BehaviorState.Completed;
-        if (intermediaryStatus == BehaviorState.Ongoing || Main.Status == BehaviorState.Ongoing)
-            return BehaviorState.Ongoing;
-        else if (intermediaryStatus == BehaviorState.Completed && Main.Status == BehaviorState.Completed)
-            return BehaviorState.Completed;
-        else
-            return BehaviorState.Inactive;
-    }
+//    public BehaviorState GetStatus()
+//    {
+//        var intermediaryStatus = Intermediary?.Status ?? BehaviorState.Completed;
+//        if (intermediaryStatus == BehaviorState.Ongoing || Main.Status == BehaviorState.Ongoing)
+//            return BehaviorState.Ongoing;
+//        else if (intermediaryStatus == BehaviorState.Completed && Main.Status == BehaviorState.Completed)
+//            return BehaviorState.Completed;
+//        else
+//            return BehaviorState.Inactive;
+//    }
 
-    public Behavior GetCurrentBehavior()
-    {
-        if (Main.Status == BehaviorState.Ongoing || 
-            Main.Status == BehaviorState.Completed || 
-            Intermediary == null)
-            return Main;
-        return Intermediary;
-    }
-}
+//    public Behavior GetCurrentBehavior()
+//    {
+//        if (Main.Status == BehaviorState.Ongoing || 
+//            Main.Status == BehaviorState.Completed || 
+//            Intermediary == null)
+//            return Main;
+//        return Intermediary;
+//    }
+//}

@@ -3,10 +3,7 @@ using UnityEngine;
 
 public class VisualSensor : Sensor
 {
-    [SerializeField] float minimumSignalStrength = 1f;
-    [SerializeField] float maximumViewDistance = 20f;
     [SerializeField] float visionAngle = 45f;
-    [SerializeField, Range(0f, 1f)] float attenuation = 1f;
     [SerializeField] Light visualization;
 
     public override HashSet<WorldObject> GetPercievedObjects()
@@ -25,16 +22,16 @@ public class VisualSensor : Sensor
     {
         var delta = worldObject.transform.position - transform.position;
         var distance = delta.magnitude;
-        if (delta.magnitude > maximumViewDistance || 
+        if (delta.magnitude > maximumRange || 
             Vector3.Angle(transform.forward, delta) > visionAngle)
             return false;
 
-        return worldObject.Visibility * Mathf.Pow(attenuation, distance) >= minimumSignalStrength;
+        return PercievableWhenAttenuated(worldObject.Visibility, distance);
     }
 
     void Start()
     {
-        visualization.range = maximumViewDistance;
+        visualization.range = maximumRange;
         visualization.innerSpotAngle = visionAngle;
         visualization.spotAngle = visionAngle;
     }

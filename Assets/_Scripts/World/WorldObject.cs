@@ -8,13 +8,15 @@ public sealed class WorldObject : MonoBehaviour
     [SerializeField] float visibility = 1f;
     [SerializeField] float audibility = 0f;
     [SerializeField] float smelliness = 0f;
+    [SerializeField] bool memorable = false;
 
-    Rigidbody rigidbody;
+    new Rigidbody rigidbody;
 
     public string Name => objectName;
     public float Visibility => visibility;
     public float Audibility => audibility;
     public float Smelliness => smelliness;
+    public bool Memorable => memorable;
 
     public Vector3 Velocity => rigidbody == null ? Vector3.zero : rigidbody.velocity;
 

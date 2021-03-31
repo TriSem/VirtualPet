@@ -15,7 +15,7 @@ public class Sit : Behavior, IAudioReciever
 
     public override void Cancel()
     {
-        Status = BehaviorState.Completed;
+        Status = BehaviorState.Inactive;
         stateMachine.Stop();
     }
 

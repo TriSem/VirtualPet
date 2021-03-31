@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class MotorSystem : MonoBehaviour
@@ -16,22 +15,32 @@ public class MotorSystem : MonoBehaviour
     bool stopped = true;
 
     SteeringBehavior currentBehavior = null;
+    SteeringBehavior nullSteer;
 
     void Start()
     {
         navAgent = GetComponent<NavMeshAgent>();
-        navAgent.speed = baseSpeed;
-        navAgent.angularSpeed = baseAngularSpeed;
-        navAgent.stoppingDistance = baseStoppingDistance;
+        ResetNavAgent();
+        nullSteer = new NullSteer(navAgent.transform);
     }
 
     void Update()
     {
         if(!stopped)
         {
-            navAgent.destination = currentBehavior.Destination();
+            navAgent.destination = currentBehavior.GetDestination();
         }
     }
+
+    void ResetNavAgent()
+    {
+        navAgent.speed = baseSpeed;
+        navAgent.angularSpeed = baseAngularSpeed;
+        navAgent.updateRotation = true;
+        navAgent.updatePosition = true;
+        navAgent.stoppingDistance = baseStoppingDistance;
+    }
+
 
     public void Pursue(Transform target, float pursueLead)
     {
@@ -45,22 +54,24 @@ public class MotorSystem : MonoBehaviour
 
     public void Wander()
     {
+        ResetNavAgent();
         stopped = false;
-        navAgent.speed = baseSpeed;
-        navAgent.angularSpeed = baseAngularSpeed;
-        navAgent.updateRotation = true;
-        navAgent.updatePosition = true;
         currentBehavior = new WanderSteer(navAgent.transform);
     }
     
     public void Follow(Transform target)
     {
+        ResetNavAgent();
         stopped = false;
-        navAgent.speed = baseSpeed;
-        navAgent.angularSpeed = baseAngularSpeed;
-        navAgent.updateRotation = true;
-        navAgent.updatePosition = true;
         currentBehavior = new Pursuit(target, 0f);
+    }
+
+    public void MoveTo(Vector3 destination)
+    {
+        ResetNavAgent();
+        stopped = false;
+        currentBehavior = new MoveTo(destination);
+        navAgent.stoppingDistance = 0.1f;
     }
 
     public void Align(Transform target)
@@ -81,7 +92,7 @@ public class MotorSystem : MonoBehaviour
     {
         stopped = true;
         agent.InternalModel.Add(InternalState.LyingDown);
-        // TODO: Play lying down animation.
+        animator.SetBool("LyingDown", true);
     }
 
     public void GetUp()
@@ -90,20 +101,23 @@ public class MotorSystem : MonoBehaviour
         agent.InternalModel.Remove(InternalState.Sitting);
         agent.InternalModel.Remove(InternalState.LyingDown);
         animator.SetBool("Sitting", false);
+        animator.SetBool("LyingDown", false);
         stopped = false;
     }
 
     public void Stop()
     {
         navAgent.ResetPath();
-        currentBehavior = new WanderSteer(transform);
+        currentBehavior = nullSteer;
         stopped = true;
     }
+
+    public bool AtDestination() => navAgent.stoppingDistance >= navAgent.remainingDistance;
 }
 
 public interface SteeringBehavior
 {
-    Vector3 Destination();
+    Vector3 GetDestination();
 }
 
 public class Pursuit : SteeringBehavior
@@ -117,7 +131,7 @@ public class Pursuit : SteeringBehavior
         this.target = target;
     }
 
-    public Vector3 Destination() => target.position + target.forward * lead;
+    public Vector3 GetDestination() => target.position + target.forward * lead;
 }
 
 public class WanderSteer : SteeringBehavior
@@ -132,7 +146,7 @@ public class WanderSteer : SteeringBehavior
         this.agentTransform = agentTransform;
     }
 
-    public Vector3 Destination()
+    public Vector3 GetDestination()
     {
         var position = agentTransform.position;
         var forward = agentTransform.forward;
@@ -146,3 +160,28 @@ public class WanderSteer : SteeringBehavior
         return UnityEngine.Random.Range(0f, 1f) - UnityEngine.Random.Range(0f, 1f);
     }
 }
+
+public class MoveTo : SteeringBehavior
+{
+    Vector3 destination;
+
+    public MoveTo(Vector3 destination)
+    {
+        this.destination = destination;
+    }
+
+    public Vector3 GetDestination() => destination;
+}
+
+public class NullSteer : SteeringBehavior
+{
+    Transform transform;
+
+    public NullSteer(Transform transform) 
+    {
+        this.transform = transform;
+    }
+
+    public Vector3 GetDestination() => transform.position;
+}
+

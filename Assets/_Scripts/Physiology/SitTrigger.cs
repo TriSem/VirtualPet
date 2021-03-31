@@ -12,7 +12,7 @@ public class SitTrigger : MonoBehaviour
         if (other.CompareTag(tagName))
         {
             Triggered = true;
-            agent.BehaviourSelection.GiveBonus("Sit", agent.DriveVector.GetValue(Drive.Food));
+            agent.BehaviourSelection.GiveBonus("Sit", agent.DriveVector.GetValue(Drive.Food) * 3);
         }
     }
 

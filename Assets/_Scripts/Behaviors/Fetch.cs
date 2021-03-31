@@ -8,7 +8,7 @@ public class Fetch : Behavior
     public override void Cancel()
     {
         stateMachine.Stop();
-        Status = BehaviorState.Completed;
+        Status = BehaviorState.Inactive;
     }
 
     public override void Use(PetAgent agent)
