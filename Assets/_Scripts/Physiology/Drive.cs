@@ -1,7 +1,9 @@
 ﻿public enum Drive
 {
     Food,
-    Energy,
-    Fun,
-    Affection
+    Sleep,
+    Play,
+    Affection,
+    Urinate,
+    Defecate
 }

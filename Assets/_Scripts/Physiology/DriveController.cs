@@ -16,7 +16,7 @@ public class DriveController : MonoBehaviour
     {
         agent = GetComponent<PetAgent>();
         agent.DriveVector.SetValue(Drive.Affection, 0.2f);
-        agent.DriveVector.SetValue(Drive.Fun, 0.1f);
+        agent.DriveVector.SetValue(Drive.Play, 0.1f);
     }
 
     void Update()
@@ -24,7 +24,7 @@ public class DriveController : MonoBehaviour
         fatigue += fatigueBuildUp * Time.deltaTime;
         fatigue = Mathf.Min(maximum, fatigue);
 
-        agent.DriveVector.SetValue(Drive.Energy, fatigue / 10f);
+        agent.DriveVector.SetValue(Drive.Sleep, fatigue / 10f);
     }
 
     public void ReduceFatigue(float amount)

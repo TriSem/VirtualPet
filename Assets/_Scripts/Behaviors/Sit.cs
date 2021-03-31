@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
-public class Sit : Behavior, IAudioReciever
+public class Sit : Behavior
 {
     [SerializeField, Range(1f, 100f)]
     float minimumSitTime = 1f;
 
     [SerializeField, Range(1f, 100f)]
     float maximumSitTime = 5f;
-
-    [SerializeField] AudioHub audioHub = null;
 
     PetStateMachine stateMachine = null;
     TimerCondition timerCondition = new TimerCondition(0f);
@@ -19,15 +17,8 @@ public class Sit : Behavior, IAudioReciever
         stateMachine.Stop();
     }
 
-    public void RecieveSignal(Command command)
-    {
-        
-    }
-
     void Start()
     {
-        audioHub.Register(this);
-
         var exit = new ExitState();
         var sit = new SitState();
         var toExit = new Transition(exit, timerCondition);

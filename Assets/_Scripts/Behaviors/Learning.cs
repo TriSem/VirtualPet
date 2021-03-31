@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Learning : MonoBehaviour
+public class Learning : MonoBehaviour, ICommandReceiver
 {
     [SerializeField, Tooltip("Actions that can be associated with a command.")]
     List<LearnableBehavior> learnables = null;
     [SerializeField] BehaviourSelection behaviourSelection = null;
     [SerializeField] Transform icon;
-
+    [SerializeField] CommandHub commandHub;
+ 
     [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
     float commandDuration = 3;
 
@@ -22,6 +23,8 @@ public class Learning : MonoBehaviour
         {
             learnableBehaviors.Add(learnable.Name, learnable);
         }
+
+        commandHub.Register(this);
     }
 
     void Update()
@@ -40,6 +43,17 @@ public class Learning : MonoBehaviour
         if (currentlyLearning != null)
         {
             var action = learnableBehaviors[currentlyLearning.Name];
+
+            // Strengthening the association between a word and a behavior
+            // will weaken the association with other behaviors. This is
+            // to prevent ambiguous phrases associated with different behaviors.
+            foreach(var learnable in learnableBehaviors)
+            {
+                if(learnable.Key != currentlyLearning.Name)
+                {
+                    learnable.Value.ReduceAssociation(phrase);
+                }
+            }
             action.PhraseRecognized(phrase);
         }
         else
@@ -66,13 +80,18 @@ public class Learning : MonoBehaviour
         icon.gameObject.SetActive(false);
         currentlyLearning = null;
     }
+
+    public void RecieveCommand(string command)
+    {
+        PhraseHeard(command);
+    }
 }
 
 [Serializable]
 public class LearnableBehavior
 {
     const string None = "None";
-    [SerializeField] string name;
+    [SerializeField] string name = None;
     [SerializeField] int minSampleSize = 5;
     [SerializeField] float minAccuracy = 0.75f;
     int sampleSize = 0;
@@ -91,6 +110,12 @@ public class LearnableBehavior
 
         sampleSize++;
         EvaluateAssociation();
+    }
+
+    public void ReduceAssociation(string phrase)
+    {
+        if (phraseCountPairs.ContainsKey(phrase))
+            phraseCountPairs[phrase]--;
     }
 
     void EvaluateAssociation()
