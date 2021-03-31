@@ -83,7 +83,7 @@ public class EatingTreatState : PetState
     {
         // TODO: Stop chewing animation.
         EatTreat eat = behavior as EatTreat;
-        agent.Stomach.ChangeFill(eat.FillValue);
+        agent.HungerController.ChangeFill(eat.FillValue);
         eat.Eaten = true;
         agent.Mouth.Release();
     }

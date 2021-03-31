@@ -1393,10 +1393,10 @@ GameObject:
   - component: {fileID: -3026241946485107329}
   - component: {fileID: 905796842272387459}
   - component: {fileID: 62655693}
-  - component: {fileID: 62655683}
   - component: {fileID: 62655688}
   - component: {fileID: 62655690}
-  - component: {fileID: 62655691}
+  - component: {fileID: 62655683}
+  - component: {fileID: 62655682}
   m_Layer: 0
   m_Name: Dog
   m_TagString: Pet
@@ -1577,9 +1577,9 @@ MonoBehaviour:
   tickRate: 0.7
   motorSystem: {fileID: 905796842272387459}
   perception: {fileID: -3026241946485107329}
-  stomach: {fileID: 62655683}
   mouth: {fileID: 1474188807}
   learning: {fileID: 62655688}
+  hungerController: {fileID: 0}
 --- !u!114 &-3026241946485107329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1635,22 +1635,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &62655683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5130983114704460639}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f913594dc43d13248811d28e70dafe17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxFill: 100
-  avoidFoodAtFill: 90
-  decayPerSecond: 0.5
-  agent: {fileID: 3221976340868355262}
 --- !u!114 &62655688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1669,6 +1653,7 @@ MonoBehaviour:
     minAccuracy: 0.8
   behaviourSelection: {fileID: 62655690}
   icon: {fileID: 543450652604306019}
+  commandHub: {fileID: 11400000, guid: b2c9e8c0075ba234b99e37151041aa6a, type: 2}
   commandDuration: 4
 --- !u!114 &62655690
 MonoBehaviour:
@@ -1686,7 +1671,7 @@ MonoBehaviour:
   internalBehaviorSet: {fileID: 87276103}
   fallbackBehavior: {fileID: 87276105}
   commandBonus: 2
---- !u!114 &62655691
+--- !u!114 &62655683
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1695,13 +1680,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 5130983114704460639}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bbdd8d11241ff24c9e704df4bd6dd77, type: 3}
+  m_Script: {fileID: 11500000, guid: 55eb9d6f03620db4293bdbd5ead56357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hungerBuildUp: 0.2
-  fatigueBuildUp: 0.1
-  minimum: -10
-  maximum: 10
+  satedRatio: 1
+  peckishRatio: 0.5
+  starvingRatio: 0
+  maxFill: 100
+  decayPerSecond: 0.5
+  agent: {fileID: 3221976340868355262}
+--- !u!114 &62655682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5130983114704460639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5b82c7f88231164d8a773c388624da4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxTiredness: 100
+  buildUpRate: 1
+  recoveryRate: 1
+  avoidSleepBelow: 20
   agent: {fileID: 3221976340868355262}
 --- !u!1 &5130983114905524889
 GameObject:

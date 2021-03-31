@@ -1,18 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Sleep : MonoBehaviour
+﻿public class Sleep : Behavior
 {
-    // Start is called before the first frame update
-    void Start()
+    PetAgent agent = null;
+
+    public override void Cancel()
     {
-        
+        agent.Motor.GetUp();
+        agent.InternalModel.Remove(InternalState.Sleeping);
+        agent.InternalModel.Remove(InternalState.LyingDown);
+        Status = BehaviorState.Inactive;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override bool PreconditionsMet(InternalModel internalModel)
     {
-        
+        return internalModel.Contains(InternalState.InBed);
+    }
+
+    public override void Use(PetAgent agent)
+    {
+        Status = BehaviorState.Ongoing;
+        this.agent = agent;
+        agent.Motor.LieDown();
+        agent.InternalModel.Add(InternalState.Sleeping);
+        agent.InternalModel.Add(InternalState.LyingDown);
     }
 }

@@ -8,21 +8,21 @@ public class PetAgent : MonoBehaviour
     [SerializeField] float tickRate = (1 / 10);
     [SerializeField] MotorSystem motorSystem = null;
     [SerializeField] Perception perception = null;
-    [SerializeField] Stomach stomach = null;
     [SerializeField] Grasp mouth = null;
     [SerializeField] Learning learning = null;
+    [SerializeField] HungerController hungerController;
     AudioSource audioSource = null;
 
     public BehaviourSelection BehaviourSelection { get; private set; } = null;
 
     public BoxCollider BoundingBox { get; private set; } = null;
     public InternalModel InternalModel { get; private set; } = new InternalModel();
-    public Stomach Stomach => stomach;
     public Perception Perception => perception;
     public DriveVector DriveVector { get; } = new DriveVector();
     public MotorSystem Motor => motorSystem;
     public Grasp Mouth => mouth;
     public Learning Learning => learning;
+    public HungerController HungerController => hungerController;
 
     public void Mjam()
     {
@@ -89,5 +89,6 @@ public enum InternalState
     Sitting,
     LyingDown,
     BeingPet,
-    InBed
+    InBed,
+    Sleeping
 }
