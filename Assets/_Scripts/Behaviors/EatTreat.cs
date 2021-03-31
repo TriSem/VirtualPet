@@ -23,9 +23,9 @@ public class EatTreat : Behavior
     {
         Status = BehaviorState.Inactive;
         stateMachine.Stop();
+        renderer.material = originalMaterial;
         if (Eaten)
             Destroy(gameObject);
-        renderer.material = originalMaterial;
     }
 
     public override void Use(PetAgent agent)
@@ -77,6 +77,8 @@ public class EatingTreatState : PetState
         agent.Mouth.Carry(behavior);
         agent.Mjam();
         TimerCondition.StopTime = timeToChew + Time.time;
+        if (agent.InternalModel.Contains(InternalState.InBed))
+            agent.Learning.StartLearning("Bed");
     }
 
     public override void OnExit(PetAgent agent, Behavior behavior)
@@ -86,5 +88,6 @@ public class EatingTreatState : PetState
         agent.HungerController.ChangeFill(eat.FillValue);
         eat.Eaten = true;
         agent.Mouth.Release();
+        agent.Learning.StopLearning();
     }
 }

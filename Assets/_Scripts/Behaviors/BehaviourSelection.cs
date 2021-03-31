@@ -25,6 +25,8 @@ public class BehaviourSelection : MonoBehaviour
 
     public void EvaluateBehaviors()
     {
+        CurrentUtility = CurrentBehavior.CalculateUtility(agent.DriveVector);
+
         var model = new InternalModel(agent.InternalModel);
         List<Tuple<Behavior, float>> candidates = new List<Tuple<Behavior, float>>();
 
@@ -82,6 +84,8 @@ public class BehaviourSelection : MonoBehaviour
             }
 
             int index = UnityEngine.Random.Range(0, candidates.Count - 1);
+            if(CurrentBehavior != null)
+                CurrentBehavior.Cancel();
             CurrentBehavior = candidates[index].Item1;
             CurrentUtility = candidates[index].Item2;
             CurrentBehavior.Use(agent);

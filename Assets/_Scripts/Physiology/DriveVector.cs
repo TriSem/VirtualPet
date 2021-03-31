@@ -19,10 +19,10 @@ public class DriveVector
     public float CalculateUtility(List<Outcome> outcomes)
     {
         float utility = 0f;
-        foreach(var driveValue in outcomes)
+        foreach(var outcome in outcomes)
         {
-            float value = drives[driveValue.Drive];
-            utility += value * driveValue.value;
+            float value = drives[outcome.Drive];
+            utility += value * outcome.value;
         }
         return utility;
     }

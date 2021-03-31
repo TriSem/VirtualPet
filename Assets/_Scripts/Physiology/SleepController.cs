@@ -14,11 +14,11 @@ public class SleepController : MonoBehaviour
     {
         if (agent.InternalModel.Contains(InternalState.Sleeping))
         {
-            tiredness -= recoveryRate;
+            tiredness -= recoveryRate * Time.deltaTime;
         }
         else
         {
-            tiredness += buildUpRate;
+            tiredness += buildUpRate * Time.deltaTime;
         }
         tiredness = Mathf.Clamp(tiredness, 0f, maxTiredness);
 

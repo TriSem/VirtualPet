@@ -20,8 +20,8 @@ public class PetStateMachine
 
     public void Stop()
     {
-        currentState.OnExit(agent, behavior);
         running = false;
+        currentState.OnExit(agent, behavior);
     }
 
     public void Update()

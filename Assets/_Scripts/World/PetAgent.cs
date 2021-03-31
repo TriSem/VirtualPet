@@ -11,11 +11,11 @@ public class PetAgent : MonoBehaviour
     [SerializeField] Grasp mouth = null;
     [SerializeField] Learning learning = null;
     [SerializeField] HungerController hungerController;
+    [SerializeField] Touch touch = null;
     AudioSource audioSource = null;
 
     public BehaviourSelection BehaviourSelection { get; private set; } = null;
 
-    public BoxCollider BoundingBox { get; private set; } = null;
     public InternalModel InternalModel { get; private set; } = new InternalModel();
     public Perception Perception => perception;
     public DriveVector DriveVector { get; } = new DriveVector();
@@ -33,7 +33,6 @@ public class PetAgent : MonoBehaviour
 
     void Awake()
     {
-        BoundingBox = GetComponent<BoxCollider>();
         BehaviourSelection = GetComponent<BehaviourSelection>();
         audioSource = GetComponent<AudioSource>();
     }
@@ -44,6 +43,11 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
+            if(touch.PetIsTouched())
+                InternalModel.Add(InternalState.BeingPet);
+            else
+                InternalModel.Remove(InternalState.BeingPet);
+
             BehaviourSelection.EvaluateBehaviors();
         }
     }
@@ -73,6 +77,8 @@ public class InternalModel
         copy.internalStates.UnionWith(internalStates);
         return copy;
     }
+
+    public HashSet<InternalState> ToHashSet() => new HashSet<InternalState>(internalStates);
 
     public InternalModel() { }
 

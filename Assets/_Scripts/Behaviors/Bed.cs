@@ -39,7 +39,7 @@ public class Bed : Behavior, IIntermediary
     {
         if(other.CompareTag("Pet"))
         {
-            other.GetComponent<PetAgent>().InternalModel.Add(InternalState.InBed);
+            other.GetComponentInParent<PetAgent>().InternalModel.Add(InternalState.InBed);
         }
     }
 
@@ -47,7 +47,7 @@ public class Bed : Behavior, IIntermediary
     {
         if(other.CompareTag("Pet"))
         {
-            other.GetComponent<PetAgent>().InternalModel.Remove(InternalState.InBed);
+            other.GetComponentInParent<PetAgent>().InternalModel.Remove(InternalState.InBed);
         }
     }
 }
