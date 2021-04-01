@@ -1580,6 +1580,7 @@ MonoBehaviour:
   mouth: {fileID: 1474188807}
   learning: {fileID: 62655688}
   hungerController: {fileID: 0}
+  touch: {fileID: 0}
 --- !u!114 &-3026241946485107329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2279,7 +2280,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 229b299a9dc94bb4496c03a50e8d58af, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: fa231695fd2b3914fb3fb831c71bba9e, type: 2}
+      objectReference: {fileID: 2100000, guid: 3fd5aed0363f5904eb205be22b90fc82, type: 2}
     - target: {fileID: 919132149155446097, guid: 229b299a9dc94bb4496c03a50e8d58af, type: 3}
       propertyPath: m_Name
       value: exclamation

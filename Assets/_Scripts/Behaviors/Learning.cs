@@ -6,13 +6,24 @@ public class Learning : MonoBehaviour, ICommandReceiver
 {
     [SerializeField, Tooltip("Actions that can be associated with a command.")]
     List<LearnableBehavior> learnables = null;
-    [SerializeField] BehaviourSelection behaviourSelection = null;
-    [SerializeField] Transform icon;
-    [SerializeField] CommandHub commandHub;
- 
+
+    [SerializeField] 
+    BehaviourSelection behaviourSelection = null;
+
+    [SerializeField, Tooltip("This will signal that learning is activated.")] 
+    Transform icon = null;
+
+    [SerializeField] CommandHub commandHub = null;
+
     [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
     float commandDuration = 3;
 
+    [SerializeField] 
+    Material commandHeardMaterial = null;
+
+    Material originalMaterial;
+    MeshRenderer iconRenderer;
+ 
     Dictionary<string, LearnableBehavior> learnableBehaviors = new Dictionary<string, LearnableBehavior>();
     List<Tuple<LearnableBehavior, float>> recentlyHeard = new List<Tuple<LearnableBehavior, float>>();
     LearnableBehavior currentlyLearning = null;
@@ -27,6 +38,12 @@ public class Learning : MonoBehaviour, ICommandReceiver
         commandHub.Register(this);
     }
 
+    void Start()
+    {
+        iconRenderer = icon.GetComponent<MeshRenderer>();
+        originalMaterial = iconRenderer.material;
+    }
+
     void Update()
     {
         // Remove priority if command was issued too long ago.
@@ -39,10 +56,10 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void PhraseHeard(string phrase)
     {
-        Debug.Log("Phrase heard.");
         if (currentlyLearning != null)
         {
             var action = learnableBehaviors[currentlyLearning.Name];
+            iconRenderer.material = commandHeardMaterial;
 
             // Strengthening the association between a word and a behavior
             // will weaken the association with other behaviors. This is
@@ -58,6 +75,8 @@ public class Learning : MonoBehaviour, ICommandReceiver
         }
         else
         {
+            // If nothing is currently being learned the pet will count the phrase
+            // as a command.
             foreach (var entry in learnableBehaviors)
             {
                 if (entry.Value.AssociatedPhrase == phrase)
@@ -79,6 +98,7 @@ public class Learning : MonoBehaviour, ICommandReceiver
     {
         icon.gameObject.SetActive(false);
         currentlyLearning = null;
+        iconRenderer.material = originalMaterial;
     }
 
     public void RecieveCommand(string command)
@@ -91,14 +111,22 @@ public class Learning : MonoBehaviour, ICommandReceiver
 public class LearnableBehavior
 {
     const string None = "None";
-    [SerializeField] string name = None;
-    [SerializeField] int minSampleSize = 5;
-    [SerializeField] float minAccuracy = 0.75f;
+
+    [SerializeField] 
+    string behaviorName = None;
+
+    [SerializeField, Tooltip("The minimum number of times the command has to be practiced.")] 
+    int minSampleSize = 5;
+
+    [SerializeField, Range(0f, 1f)] 
+    [Tooltip("The percentage of the sample size needed for a phrase to be associated with a command.")] 
+    float minAccuracy = 0.75f;
+
     int sampleSize = 0;
 
     public string AssociatedPhrase { get; private set; } = None;
 
-    public string Name => name;
+    public string Name => behaviorName;
     Dictionary<string, int> phraseCountPairs = new Dictionary<string, int>();
 
     public void PhraseRecognized(string phrase)
