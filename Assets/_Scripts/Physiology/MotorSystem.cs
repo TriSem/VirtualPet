@@ -55,6 +55,7 @@ public class MotorSystem : MonoBehaviour
     public void Wander()
     {
         ResetNavAgent();
+        animator.SetBool("Walking", true);
         stopped = false;
         currentBehavior = new WanderSteer(navAgent.transform);
     }
@@ -62,6 +63,7 @@ public class MotorSystem : MonoBehaviour
     public void Follow(Transform target)
     {
         ResetNavAgent();
+        animator.SetBool("Walking", true);
         stopped = false;
         currentBehavior = new Pursuit(target, 0f);
     }
@@ -69,6 +71,7 @@ public class MotorSystem : MonoBehaviour
     public void MoveTo(Vector3 destination)
     {
         ResetNavAgent();
+        animator.SetBool("Walking", true);
         stopped = false;
         currentBehavior = new MoveTo(destination);
         navAgent.stoppingDistance = 0.1f;
@@ -122,6 +125,7 @@ public class MotorSystem : MonoBehaviour
     public void Stop()
     {
         navAgent.ResetPath();
+        animator.SetBool("Walking", false);
         currentBehavior = nullSteer;
         stopped = true;
     }

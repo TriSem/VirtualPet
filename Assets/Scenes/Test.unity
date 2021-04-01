@@ -445,6 +445,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.689
       objectReference: {fileID: 0}
+    - target: {fileID: 905796842272387459, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: baseStoppingDistance
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3221976340868355262, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: touch
       value: 
@@ -936,7 +940,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261201474}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.001354701, y: 2.5, z: -2.9999998}
+  m_LocalPosition: {x: 0.0013547015, y: 2.5, z: -2.9999998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1175334140}
