@@ -97,12 +97,26 @@ public class MotorSystem : MonoBehaviour
 
     public void GetUp()
     {
-        // TODO: Play getup animation.
         agent.InternalModel.Remove(InternalState.Sitting);
         agent.InternalModel.Remove(InternalState.LyingDown);
         animator.SetBool("Sitting", false);
         animator.SetBool("LyingDown", false);
         stopped = false;
+    }
+
+    public void ShakeHead()
+    {
+        animator.SetTrigger("ShakeHead");
+    }
+
+    public void StartWaggingTail()
+    {
+        animator.SetBool("WaggingTail", true);
+    }
+
+    public void StopWaggingTail()
+    {
+        animator.SetBool("WaggingTail", false);
     }
 
     public void Stop()

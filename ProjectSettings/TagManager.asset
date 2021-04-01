@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Treat
   - Pet
+  - Hand
   layers:
   - Default
   - TransparentFX

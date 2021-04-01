@@ -171,7 +171,7 @@ MonoBehaviour:
   outcomes:
   - drive: 0
     value: 1
-  fillValue: 5
+  fillValue: 20
   timeToChew: 2
   interaction: {fileID: 2432932613953017158}
   highlightMaterial: {fileID: 2100000, guid: fa231695fd2b3914fb3fb831c71bba9e, type: 2}
@@ -191,6 +191,7 @@ MonoBehaviour:
   visibility: 1
   audibility: 0
   smelliness: 1
+  memorable: 0
 --- !u!54 &-9206998629554851891
 Rigidbody:
   m_ObjectHideFlags: 0

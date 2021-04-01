@@ -4,18 +4,20 @@ public class TouchReceptor : MonoBehaviour
 {
     public bool Fired { get; private set; }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider collider)
     {
-        if(collision.collider.CompareTag("Player"))
+        if(collider.CompareTag("Hand"))
         {
+            Debug.Log("Touch registered");
             Fired = true;
         }
     }
 
-    void OnCollisionExit(Collision collision)
+    void OnTriggerExit(Collider collider)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (collider.CompareTag("Hand"))
         {
+            Debug.Log("Touch lost");
             Fired = false;
         }
     }

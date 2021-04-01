@@ -73,7 +73,7 @@ public class EatingTreatState : PetState
     public override void OnEntry(PetAgent agent, Behavior behavior)
     {
         agent.Motor.Stop();
-        // TODO: Start chewing animation.
+        agent.Motor.StartWaggingTail();
         agent.Mouth.Carry(behavior);
         agent.Mjam();
         TimerCondition.StopTime = timeToChew + Time.time;
@@ -89,5 +89,6 @@ public class EatingTreatState : PetState
         eat.Eaten = true;
         agent.Mouth.Release();
         agent.Learning.StopLearning();
+        agent.Motor.StopWaggingTail();
     }
 }

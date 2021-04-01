@@ -1,18 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class FunController : MonoBehaviour
+public class PlayController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] PetAgent agent;
+    [SerializeField] float flatPlayValue;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        agent.DriveVector.SetValue(Drive.Play, flatPlayValue);
     }
 }

@@ -9,7 +9,6 @@ public class PlayerControl : MonoBehaviour
 
     Vector3 velocity = default;
     Vector3 neckPosition = default;
-    float currentCameraPitch;
     CharacterController characterController;
 
     void Start()
@@ -57,6 +56,6 @@ public class PlayerControl : MonoBehaviour
 
     void Crouch()
     {
-        neck.transform.localPosition = neckPosition + new Vector3(0, -0.5f, 0);
+        neck.transform.localPosition = neckPosition * 0.3f;
     }
 }

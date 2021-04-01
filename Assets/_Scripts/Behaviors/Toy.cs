@@ -41,3 +41,33 @@ public class Toy : Behavior, IPhysicsObject
         stateMachine.Update();
     }
 }
+
+public class PlayAndWander : PetState
+{
+    float nextShakeTime;
+
+    public override void OnEntry(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Wander();
+        agent.Mouth.Carry(behavior);
+        agent.Motor.StartWaggingTail();
+        nextShakeTime = Time.time + Random.Range(1f, 5f);
+    }
+
+    public override void OnExit(PetAgent agent, Behavior behavior)
+    {
+        agent.Motor.Stop();
+        agent.Motor.StopWaggingTail();
+        agent.Mouth.Release();
+    }
+
+    public override void OnUpdate(PetAgent agent, Behavior behavior)
+    {
+        float time = Time.time;
+        if (time > nextShakeTime)
+        {
+            agent.Motor.ShakeHead();
+            nextShakeTime = time + Random.Range(1f, 5f);
+        }
+    }
+}

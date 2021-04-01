@@ -5,7 +5,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent), typeof(BehaviourSelection))]
 public class PetAgent : MonoBehaviour
 {
-    [SerializeField] float tickRate = (1 / 10);
+    [SerializeField] float tickRate = 0.5f;
     [SerializeField] MotorSystem motorSystem = null;
     [SerializeField] Perception perception = null;
     [SerializeField] Grasp mouth = null;
@@ -29,7 +29,7 @@ public class PetAgent : MonoBehaviour
         audioSource.Play();
     }
 
-    float lastTick = (1 / 5);
+    float lastTick = 0;
 
     void Awake()
     {
@@ -43,11 +43,6 @@ public class PetAgent : MonoBehaviour
         if (lastTick + tickRate < time)
         {
             lastTick = time;
-            if(touch.PetIsTouched())
-                InternalModel.Add(InternalState.BeingPet);
-            else
-                InternalModel.Remove(InternalState.BeingPet);
-
             BehaviourSelection.EvaluateBehaviors();
         }
     }
@@ -61,7 +56,7 @@ public class InternalModel
 
     public void Add(HashSet<InternalState> internalStates) => internalStates.UnionWith(internalStates);
 
-    public void Remove(InternalState internalState) => internalStates.Add(internalState);
+    public void Remove(InternalState internalState) => internalStates.Remove(internalState);
 
     public void Remove(HashSet<InternalState> internalStates) => internalStates.IntersectWith(internalStates);
 

@@ -22,14 +22,16 @@ public class HungerController : MonoBehaviour
     {
         ChangeFill(-decayPerSecond * Time.deltaTime);
         var drives = agent.DriveVector;
+        float driveValue;
         if (FillRatio <= starvingRatio)
-            drives.SetValue(Drive.Food, 2f);
+            driveValue = 2f;
         else if (FillRatio <= peckishRatio)
-            drives.SetValue(Drive.Food, 1f);
+            driveValue = 1f;
         else if (FillRatio >= satedRatio)
-            drives.SetValue(Drive.Food, -1f);
+            driveValue = -1f;
         else
-            drives.SetValue(Drive.Food, 1f);
+            driveValue = 1f;
+        drives.SetValue(Drive.Food, driveValue);
     }
 
     public void ChangeFill(float value)

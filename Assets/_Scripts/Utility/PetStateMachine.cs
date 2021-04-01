@@ -98,34 +98,6 @@ public class ExitState : PetState
     }
 }
 
-public class PlayAndWander : PetState
-{
-    float nextShakeTime;
-
-    public override void OnEntry(PetAgent agent, Behavior behavior)
-    {
-        agent.Motor.Wander();
-        agent.Mouth.Carry(behavior);
-        nextShakeTime = Time.time + Random.Range(1f, 5f);
-    }
-
-    public override void OnExit(PetAgent agent, Behavior behavior)
-    {
-        agent.Motor.Stop();
-        agent.Mouth.Release();
-    }
-
-    public override void OnUpdate(PetAgent agent, Behavior behavior)
-    {
-        float time = Time.time;
-        if (time > nextShakeTime)
-        {
-            // Play shake animation
-            nextShakeTime = time + Random.Range(1f, 5f);
-        }
-    }
-}
-
 public class PursueState : PetState
 {
     public override void OnEntry(PetAgent agent, Behavior behavior)
