@@ -83,7 +83,6 @@ public class EatingTreatState : PetState
 
     public override void OnExit(PetAgent agent, Behavior behavior)
     {
-        // TODO: Stop chewing animation.
         EatTreat eat = behavior as EatTreat;
         agent.HungerController.ChangeFill(eat.FillValue);
         eat.Eaten = true;

@@ -383,7 +383,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.size
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.data[1].name
@@ -404,6 +404,34 @@ PrefabInstance:
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.data[0].behaviorName
       value: Sit
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: commandHeardMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: fa231695fd2b3914fb3fb831c71bba9e, type: 2}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[2].behaviorName
+      value: Horst
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[2].minSampleSize
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[2].minAccuracy
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[3].behaviorName
+      value: Fetch
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[3].minSampleSize
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: learnables.Array.data[3].minAccuracy
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 895941467, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -588,6 +616,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5130983114704460636, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
   m_PrefabInstance: {fileID: 62655679}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &62655697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62655681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34f1ff4a545eb1d4db3b6c1bfe2f72dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 62655685}
+  flatPlayValue: 0.3
 --- !u!1 &79208571
 GameObject:
   m_ObjectHideFlags: 0
@@ -894,7 +936,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261201474}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0013546821, y: 2.5, z: -2.9999998}
+  m_LocalPosition: {x: 0.001354701, y: 2.5, z: -2.9999998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1175334140}
@@ -6392,6 +6434,16 @@ MonoBehaviour:
   walkSpeed: 4
   neck: {fileID: 2067916203}
   playerCamera: {fileID: 1238023241}
+  commands:
+  - key: 49
+    commandName: Horst
+  - key: 50
+    commandName: Sit
+  - key: 51
+    commandName: Bed
+  - key: 52
+    commandName: Fetch
+  commandHub: {fileID: 11400000, guid: b2c9e8c0075ba234b99e37151041aa6a, type: 2}
 --- !u!114 &1109424610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8551,7 +8603,7 @@ MonoBehaviour:
   objectName: Toy
   visibility: 1
   audibility: 0
-  smelliness: 0
+  smelliness: 0.3
   memorable: 0
 --- !u!54 &2018270184
 Rigidbody:

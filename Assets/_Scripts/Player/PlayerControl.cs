@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerControl : MonoBehaviour
@@ -6,6 +8,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] float walkSpeed = 3f;
     [SerializeField] Transform neck = default;
     [SerializeField] Transform playerCamera = default;
+    [SerializeField] List<CommandMapping> commands = null;
+    [SerializeField] CommandHub commandHub = null;
 
     Vector3 velocity = default;
     Vector3 neckPosition = default;
@@ -36,6 +40,13 @@ public class PlayerControl : MonoBehaviour
         }
         else
             neck.localPosition = neckPosition;
+
+        foreach(var mapping in commands)
+        {
+            if (Input.GetKeyDown(mapping.Key))
+                commandHub.PushSignal(mapping.CommandName);
+        }
+
     }
 
     void MoveCharacter()
@@ -58,4 +69,15 @@ public class PlayerControl : MonoBehaviour
     {
         neck.transform.localPosition = neckPosition * 0.3f;
     }
+
+    [Serializable]
+    struct CommandMapping
+    {
+        [SerializeField] KeyCode key;
+        [SerializeField] string commandName;
+
+        public KeyCode Key => key;
+        public string CommandName => commandName;
+    }
+
 }
