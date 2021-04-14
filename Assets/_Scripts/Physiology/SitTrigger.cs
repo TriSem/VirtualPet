@@ -12,13 +12,16 @@ public class SitTrigger : MonoBehaviour
         if (other.CompareTag(tagName))
         {
             Triggered = true;
-            agent.BehaviourSelection.GiveBonus("Sit", agent.DriveVector.GetValue(Drive.Food) * 3);
+            agent.BehaviourSelection.GiveBonus("Sit", Mathf.Max(agent.DriveVector.GetValue(Drive.Food) * 3, 0f));
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        Triggered = false;
-        agent.BehaviourSelection.RemoveBonus("Sit");
+        if (other.CompareTag(tagName))
+        {
+            Triggered = false;
+            agent.BehaviourSelection.RemoveBonus("Sit");
+        }
     }
 }

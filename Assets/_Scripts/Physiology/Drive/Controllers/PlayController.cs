@@ -2,8 +2,8 @@
 
 public class PlayController : MonoBehaviour
 {
-    [SerializeField] PetAgent agent;
-    [SerializeField] float flatPlayValue;
+    [SerializeField] PetAgent agent = null;
+    [SerializeField] float flatPlayValue = default;
 
     void Start()
     {

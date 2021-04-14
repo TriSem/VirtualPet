@@ -25,7 +25,7 @@ public class HungerController : MonoBehaviour
         float driveValue;
         if (FillRatio <= starvingRatio)
             driveValue = 2f;
-        else if (FillRatio <= peckishRatio)
+        if (FillRatio <= peckishRatio)
             driveValue = 1f;
         else if (FillRatio >= satedRatio)
             driveValue = -1f;

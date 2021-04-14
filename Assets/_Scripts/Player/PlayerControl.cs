@@ -10,10 +10,12 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] Transform playerCamera = default;
     [SerializeField] List<CommandMapping> commands = null;
     [SerializeField] CommandHub commandHub = null;
+    [SerializeField] float commandCooldown = 1f;
 
     Vector3 velocity = default;
     Vector3 neckPosition = default;
     CharacterController characterController;
+    float nextCommandAvailable = 0f;
 
     void Start()
     {
@@ -41,12 +43,18 @@ public class PlayerControl : MonoBehaviour
         else
             neck.localPosition = neckPosition;
 
-        foreach(var mapping in commands)
+        float time = Time.time;
+        if(time >= nextCommandAvailable)
         {
-            if (Input.GetKeyDown(mapping.Key))
-                commandHub.PushSignal(mapping.CommandName);
+            foreach (var mapping in commands)
+            {
+                if (Input.GetKeyDown(mapping.Key))
+                {
+                    commandHub.PushSignal(mapping.CommandName);
+                    nextCommandAvailable = time + commandCooldown;
+                }
+            }
         }
-
     }
 
     void MoveCharacter()

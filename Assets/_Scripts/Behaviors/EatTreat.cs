@@ -87,7 +87,7 @@ public class EatingTreatState : PetState
         agent.HungerController.ChangeFill(eat.FillValue);
         eat.Eaten = true;
         agent.Mouth.Release();
-        agent.Learning.StopLearning();
+        agent.Learning.StopLearning("Bed");
         agent.Motor.StopWaggingTail();
     }
 }

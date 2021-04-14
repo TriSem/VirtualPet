@@ -13,10 +13,14 @@ public class Learning : MonoBehaviour, ICommandReceiver
     [SerializeField, Tooltip("This will signal that learning is activated.")] 
     Transform icon = null;
 
-    [SerializeField] CommandHub commandHub = null;
+    [SerializeField] 
+    CommandHub commandHub = null;
 
     [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
     float commandDuration = 3;
+
+    [SerializeField] 
+    float learningCooldown = 5f;
 
     [SerializeField] 
     Material commandHeardMaterial = null;
@@ -27,6 +31,7 @@ public class Learning : MonoBehaviour, ICommandReceiver
     Dictionary<string, LearnableBehavior> learnableBehaviors = new Dictionary<string, LearnableBehavior>();
     List<Tuple<LearnableBehavior, float>> recentlyHeard = new List<Tuple<LearnableBehavior, float>>();
     LearnableBehavior currentlyLearning = null;
+    float nextLearningAvailable = 0f;
 
     void Awake()
     {
@@ -56,33 +61,26 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void PhraseHeard(string phrase)
     {
+        Debug.Log("Heard: " + phrase);
         if (currentlyLearning != null)
         {
             var action = learnableBehaviors[currentlyLearning.Name];
             iconRenderer.material = commandHeardMaterial;
-
-            // Strengthening the association between a word and a behavior
-            // will weaken the association with other behaviors. This is
-            // to prevent ambiguous phrases associated with different behaviors.
-            foreach(var learnable in learnableBehaviors)
-            {
-                if(learnable.Key != currentlyLearning.Name)
-                {
-                    learnable.Value.ReduceAssociation(phrase);
-                }
-            }
+            
             action.PhraseRecognized(phrase);
         }
         else
         {
             // If nothing is currently being learned the pet will count the phrase
             // as a command.
+
             foreach (var entry in learnableBehaviors)
             {
                 if (entry.Value.AssociatedPhrase == phrase)
                 {
                     recentlyHeard.Add(new Tuple<LearnableBehavior, float>(entry.Value, Time.time + commandDuration));
                     behaviourSelection.StartCommanding(entry.Value.Name);
+                    Debug.Log("Start Commanding: " + entry.Value.Name);
                 }
             }
         }
@@ -90,15 +88,25 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void StartLearning(string behaviorName)
     {
-        icon.gameObject.SetActive(true);
-        currentlyLearning = learnableBehaviors[behaviorName];
+        if (nextLearningAvailable >= Time.time) ;
+        {
+            Debug.Log("Start learning: " + behaviorName);
+            icon.gameObject.SetActive(true);
+            currentlyLearning = learnableBehaviors[behaviorName];
+            nextLearningAvailable = Time.time + learningCooldown;
+        }
+        Debug.Log("Learning not available");
     }
 
-    public void StopLearning()
+    public void StopLearning(string behaviorName)
     {
-        icon.gameObject.SetActive(false);
-        currentlyLearning = null;
-        iconRenderer.material = originalMaterial;
+        if(currentlyLearning != null && currentlyLearning.Name == behaviorName)
+        {
+            Debug.Log("Stop learning: " + behaviorName);
+            icon.gameObject.SetActive(false);
+            currentlyLearning = null;
+            iconRenderer.material = originalMaterial;
+        }
     }
 
     public void RecieveCommand(string command)
@@ -138,12 +146,6 @@ public class LearnableBehavior
 
         sampleSize++;
         EvaluateAssociation();
-    }
-
-    public void ReduceAssociation(string phrase)
-    {
-        if (phraseCountPairs.ContainsKey(phrase))
-            phraseCountPairs[phrase]--;
     }
 
     void EvaluateAssociation()

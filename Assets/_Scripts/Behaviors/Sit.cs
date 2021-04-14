@@ -8,6 +8,8 @@ public class Sit : Behavior
     [SerializeField, Range(1f, 100f)]
     float maximumSitTime = 5f;
 
+    [SerializeField] SitTrigger trigger = null;
+
     PetStateMachine stateMachine = null;
     TimerCondition timerCondition = new TimerCondition(0f);
 
@@ -53,7 +55,7 @@ public class SitState : PetState
     public override void OnExit(PetAgent agent, Behavior behavior)
     {
         agent.Motor.GetUp();
-        agent.Learning.StopLearning();
+        agent.Learning.StopLearning("Sit");
     }
 }
 
