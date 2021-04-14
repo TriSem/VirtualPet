@@ -15,6 +15,7 @@ public class EnjoyAffection : Behavior
         agent.Motor.GetUp();
         agent.Motor.StopWaggingTail();
         particles.gameObject.SetActive(false);
+        agent.Learning.StopLearning("Follow");
     }
 
     public override void Use(PetAgent agent)
@@ -24,6 +25,7 @@ public class EnjoyAffection : Behavior
         particles.gameObject.SetActive(true);
         agent.Motor.SitDown();
         agent.Motor.StartWaggingTail();
+        agent.Learning.StartLearning("Follow");
     }
 
     public override bool PreconditionsMet(InternalModel internalModel)

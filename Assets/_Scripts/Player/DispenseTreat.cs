@@ -1,26 +1,18 @@
 ﻿using UnityEngine;
 
+// Lets the player spawn treats in their hand.
 public class DispenseTreat : MonoBehaviour
 {
     [SerializeField] Transform treatPrefab = default;
     [SerializeField] Transform cursor = default;
-    EatTreat instance = null;
+    [SerializeField] ObjectSelection objectSelection = null;
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Mouse1) && instance == null)
+        if(Input.GetKeyDown(KeyCode.Mouse1) && !objectSelection.HoldingItem)
         {
-            instance = Instantiate(treatPrefab, cursor).GetComponent<EatTreat>();
-            instance.transform.localPosition = Vector3.zero;
-            instance.GetComponent<Rigidbody>().isKinematic = true;
-            instance.enabled = false;
-        }
-        if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            instance.transform.SetParent(null);
-            instance.enabled = true;
-            instance.GetComponent<Rigidbody>().isKinematic = false;
-            instance = null;
+            var instance = Instantiate(treatPrefab, cursor).GetComponent<WorldObject>();
+            objectSelection.PlaceObjectIntoHand(instance);
         }
     }
 }

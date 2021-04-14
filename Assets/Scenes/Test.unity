@@ -381,6 +381,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 62655682, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
+      propertyPath: buildUpRate
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.size
       value: 4
@@ -411,7 +415,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: fa231695fd2b3914fb3fb831c71bba9e, type: 2}
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.data[2].behaviorName
-      value: Horst
+      value: Follow
       objectReference: {fileID: 0}
     - target: {fileID: 62655688, guid: f651ce1a71c185b4499586fc695e71d1, type: 3}
       propertyPath: learnables.Array.data[2].minSampleSize
@@ -948,7 +952,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261201474}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0013547566, y: 2.5, z: -2.9999998}
+  m_LocalPosition: {x: 0.0013547608, y: 2.5, z: -2.9999998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1175334140}
@@ -6421,6 +6425,7 @@ GameObject:
   - component: {fileID: 1109424608}
   - component: {fileID: 1109424613}
   - component: {fileID: 1109424611}
+  - component: {fileID: 1109424614}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -6703,6 +6708,21 @@ MonoBehaviour:
   outcomes:
   - drive: 3
     value: 0.1
+--- !u!114 &1109424614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1109424603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81e11a26262d7449b4ff8738bb057c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treatPrefab: {fileID: 8227938744386242098, guid: 629e94bcc54da0647b0e94407941e2f6, type: 3}
+  cursor: {fileID: 1840537531}
+  objectSelection: {fileID: 1109424608}
 --- !u!1 &1119222986
 GameObject:
   m_ObjectHideFlags: 0
@@ -8057,7 +8077,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1840537531}
-  - component: {fileID: 1840537532}
   - component: {fileID: 1840537533}
   m_Layer: 0
   m_Name: Hand
@@ -8080,20 +8099,6 @@ Transform:
   m_Father: {fileID: 58907811}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: -11.77, z: 0}
---- !u!114 &1840537532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1840537530}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c81e11a26262d7449b4ff8738bb057c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  treatPrefab: {fileID: 8227938744386242098, guid: 629e94bcc54da0647b0e94407941e2f6, type: 3}
-  cursor: {fileID: 1840537531}
 --- !u!65 &1840537533
 BoxCollider:
   m_ObjectHideFlags: 0

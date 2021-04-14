@@ -24,8 +24,8 @@ public class ObjectSelection : MonoBehaviour
     WorldObject currentlyHeld = null;
     LayerMask mask;
 
-    bool ItemSelected => currentlySelected != null;
-    bool HoldingItem => currentlyHeld != null;
+    public bool ItemSelected => currentlySelected != null;
+    public bool HoldingItem => currentlyHeld != null;
 
     void Start()
     {
@@ -109,5 +109,13 @@ public class ObjectSelection : MonoBehaviour
             rigidBody.velocity = camera.transform.forward * throwSpeed;
 
         Release();
+    }
+
+    public void PlaceObjectIntoHand(WorldObject worldObject)
+    {
+        if (currentlyHeld)
+            Release();
+        currentlySelected = worldObject;
+        Grab();
     }
 }

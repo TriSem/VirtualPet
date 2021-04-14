@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2432932613953017158}
   m_Layer: 10
   m_Name: Interaction
-  m_TagString: Untagged
+  m_TagString: Treat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43,7 +43,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.5
+  m_Radius: 0.75
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2432932613953017158
 MonoBehaviour:
