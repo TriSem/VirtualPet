@@ -14,14 +14,12 @@ public class Toy : Behavior, IPhysicsObject
     {
         stateMachine.Stop();
         Status = BehaviorState.Inactive;
-        Debug.Log("Toy stop.");
     }
 
     public override void Use(PetAgent agent)
     {
         Status = BehaviorState.Ongoing;
         stateMachine.Start(agent, this);
-        Debug.Log("Toy start");
     }
 
     void Start()

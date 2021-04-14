@@ -8,7 +8,7 @@ public class PetAgent : MonoBehaviour
     [SerializeField] float tickRate = 0.5f;
     [SerializeField] MotorSystem motorSystem = null;
     [SerializeField] Perception perception = null;
-    [SerializeField] Grasp mouth = null;
+    [SerializeField] PetGrasp mouth = null;
     [SerializeField] Learning learning = null;
     [SerializeField] HungerController hungerController;
     [SerializeField] Touch touch = null;
@@ -20,7 +20,7 @@ public class PetAgent : MonoBehaviour
     public Perception Perception => perception;
     public DriveVector DriveVector { get; } = new DriveVector();
     public MotorSystem Motor => motorSystem;
-    public Grasp Mouth => mouth;
+    public PetGrasp Mouth => mouth;
     public Learning Learning => learning;
     public HungerController HungerController => hungerController;
 

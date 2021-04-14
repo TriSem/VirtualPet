@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+// Lets the player kick around objects by walking into them.
 public class Kick : MonoBehaviour
 {
     [SerializeField] float strength = 1f;

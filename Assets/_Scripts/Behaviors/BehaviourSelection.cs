@@ -99,7 +99,6 @@ public class BehaviourSelection : MonoBehaviour
             CurrentBehavior = candidates[index].Item1;
             CurrentUtility = candidates[index].Item2;
             CurrentBehavior.Use(agent);
-            Debug.Log(CurrentBehavior.GetType().Name + " selected.");
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using Cinemachine;
 using UnityEngine;
 
-public class Arm : MonoBehaviour
+public class ArmAlignment : MonoBehaviour
 {
     [SerializeField] CinemachineVirtualCamera cam = null;
 

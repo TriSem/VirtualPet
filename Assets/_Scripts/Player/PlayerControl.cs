@@ -12,8 +12,9 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] CommandHub commandHub = null;
     [SerializeField] float commandCooldown = 1f;
 
+    AudioSource audioSource = null;
     Vector3 velocity = default;
-    Vector3 neckPosition = default;
+    Vector3 defaultNeckPosition = default;
     CharacterController characterController;
     float nextCommandAvailable = 0f;
 
@@ -21,16 +22,18 @@ public class PlayerControl : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        audioSource = GetComponent<AudioSource>();
         characterController = GetComponent<CharacterController>();
-        neckPosition = neck.transform.localPosition;
+        defaultNeckPosition = neck.transform.localPosition;
     }
 
     void Update()
     {
-        ProcessInput();
+        ProcessMovement();
+        ProcessCommandInput();
     }
 
-    void ProcessInput()
+    void ProcessMovement()
     {
         var lookDirection = playerCamera.forward;
         lookDirection.y = 0;
@@ -41,20 +44,9 @@ public class PlayerControl : MonoBehaviour
             Crouch();
         }
         else
-            neck.localPosition = neckPosition;
+            neck.localPosition = defaultNeckPosition;
 
-        float time = Time.time;
-        if(time >= nextCommandAvailable)
-        {
-            foreach (var mapping in commands)
-            {
-                if (Input.GetKeyDown(mapping.Key))
-                {
-                    commandHub.PushSignal(mapping.CommandName);
-                    nextCommandAvailable = time + commandCooldown;
-                }
-            }
-        }
+        ProcessCommandInput();
     }
 
     void MoveCharacter()
@@ -73,9 +65,32 @@ public class PlayerControl : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);
     }
 
+    void ProcessCommandInput()
+    {
+        float time = Time.time;
+        if (time >= nextCommandAvailable)
+        {
+            foreach (var mapping in commands)
+            {
+                if (Input.GetKeyDown(mapping.Key))
+                {
+                    commandHub.PushSignal(mapping.CommandName);
+                    nextCommandAvailable = time + commandCooldown;
+                    audioSource.clip = mapping.AudioClip;
+                    audioSource.Play();
+                    break;
+                }
+            }
+        }
+    }
+
     void Crouch()
     {
-        neck.transform.localPosition = neckPosition * 0.3f;
+        var newNeckPosition = neck.transform.localPosition;
+        newNeckPosition -= newNeckPosition * 2f * Time.deltaTime;
+        if (newNeckPosition.sqrMagnitude < (defaultNeckPosition * 0.3f).sqrMagnitude)
+            newNeckPosition = defaultNeckPosition * 0.3f;
+        neck.transform.localPosition = newNeckPosition;
     }
 
     [Serializable]
@@ -83,9 +98,10 @@ public class PlayerControl : MonoBehaviour
     {
         [SerializeField] KeyCode key;
         [SerializeField] string commandName;
+        [SerializeField] AudioClip audioClip;
 
         public KeyCode Key => key;
         public string CommandName => commandName;
+        public AudioClip AudioClip => audioClip;
     }
-
 }

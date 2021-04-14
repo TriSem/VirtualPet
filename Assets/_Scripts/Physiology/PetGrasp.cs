@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class Grasp : MonoBehaviour
+// Lets the pet carry world objects.
+public class PetGrasp : MonoBehaviour
 {
     [SerializeField] PetAgent agent = null;
     Behavior carried = null;
