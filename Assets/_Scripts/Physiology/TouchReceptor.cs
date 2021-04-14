@@ -8,7 +8,7 @@ public class TouchReceptor : MonoBehaviour
     {
         if(collider.CompareTag("Hand"))
         {
-            Debug.Log("Touch registered");
+            //Debug.Log("Touch registered");
             Fired = true;
         }
     }
@@ -17,7 +17,7 @@ public class TouchReceptor : MonoBehaviour
     {
         if (collider.CompareTag("Hand"))
         {
-            Debug.Log("Touch lost");
+            //Debug.Log("Touch lost");
             Fired = false;
         }
     }

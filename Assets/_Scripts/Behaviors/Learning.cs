@@ -51,11 +51,17 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     void Update()
     {
+        float time = Time.time;
+
         // Remove priority if command was issued too long ago.
-        foreach (var tuple in recentlyHeard)
+        for (int i = recentlyHeard.Count - 1; i >= 0; i--)
         {
-            if (Time.time >= tuple.Item2)
+            var tuple = recentlyHeard[i];
+            if (time >= tuple.Item2)
+            {
                 behaviourSelection.StopCommanding(tuple.Item1.Name);
+                recentlyHeard.RemoveAt(i);
+            }
         }
     }
 

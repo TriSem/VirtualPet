@@ -8,8 +8,6 @@ public class Sit : Behavior
     [SerializeField, Range(1f, 100f)]
     float maximumSitTime = 5f;
 
-    [SerializeField] SitTrigger trigger = null;
-
     PetStateMachine stateMachine = null;
     TimerCondition timerCondition = new TimerCondition(0f);
 

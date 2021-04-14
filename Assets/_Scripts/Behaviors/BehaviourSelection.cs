@@ -86,17 +86,20 @@ public class BehaviourSelection : MonoBehaviour
             int index = UnityEngine.Random.Range(0, candidates.Count - 1);
 
             // Don't restart a behavior that is still running.
-            if (CurrentBehavior == null || CurrentBehavior == candidates[index].Item1)
+            if (CurrentBehavior != null)
             {
-                Debug.Log("Continue behavior");
-                return;
+                if (CurrentBehavior == candidates[index].Item1)
+                {
+                    Debug.Log("Continue behavior");
+                    return;
+                }
+                CurrentBehavior.Cancel();
             }
 
-            CurrentBehavior.Cancel();
             CurrentBehavior = candidates[index].Item1;
             CurrentUtility = candidates[index].Item2;
             CurrentBehavior.Use(agent);
-            Debug.Log(CurrentBehavior.GetType().Name + "selected.");
+            Debug.Log(CurrentBehavior.GetType().Name + " selected.");
         }
     }
 
