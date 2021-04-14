@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class EatTreat : Behavior
+public class EatTreat : Behavior, IPhysicsObject
 {
     [SerializeField, Range(0f, 1000f)] 
     float fillValue = 5f;
@@ -10,6 +10,8 @@ public class EatTreat : Behavior
     [SerializeField] Interaction interaction = default;
     [SerializeField] Material highlightMaterial = default;
 
+    new Rigidbody rigidbody;
+    new Collider collider;
     new MeshRenderer renderer= null;
     Material originalMaterial = null;
 
@@ -18,6 +20,10 @@ public class EatTreat : Behavior
     PetStateMachine stateMachine;
 
     public float FillValue => fillValue;
+
+    public Rigidbody Rigidbody => rigidbody;
+
+    public Collider Collider => collider;
 
     public override void Cancel()
     {
@@ -50,6 +56,12 @@ public class EatTreat : Behavior
         moving.Transitions.Add(toEating);
         eating.Transitions.Add(toExit);
         stateMachine = new PetStateMachine(moving);
+    }
+
+    void Start()
+    {
+        rigidbody = GetComponent<Rigidbody>();
+        collider = GetComponent<Collider>();
     }
 
     void Update()
