@@ -2,8 +2,11 @@
 
 public class CommandButton : MonoBehaviour
 {
-    [SerializeField] string command = default;
-    [SerializeField] CommandHub audioHub = default;
+    [SerializeField] 
+    string command = default;
+
+    [SerializeField] 
+    CommandHub audioHub = default;
 
     public void OnSendCommand()
     {

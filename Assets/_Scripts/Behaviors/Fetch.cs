@@ -7,6 +7,7 @@ public class Fetch : Behavior
 
     [SerializeField, Tooltip("How long should the pet wait after delivering?")] 
     float waitForRewardTime = 4f;
+
     PetStateMachine stateMachine = null;
     
 

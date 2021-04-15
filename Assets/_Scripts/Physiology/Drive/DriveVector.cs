@@ -41,8 +41,11 @@ public class DriveVector
 [Serializable]
 public struct Outcome
 {
-    [SerializeField] Drive drive;
-    [SerializeField] public float value;
+    [SerializeField] 
+    Drive drive;
+
+    [SerializeField] 
+    public float value;
 
     public Drive Drive => drive;
 }

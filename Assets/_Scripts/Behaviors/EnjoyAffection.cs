@@ -3,8 +3,12 @@
 public class EnjoyAffection : Behavior
 {
     PetAgent agent;
-    [SerializeField] Transform particles = null;
-    [SerializeField] float noTouchTimer = 5f;
+
+    [SerializeField] 
+    Transform particles = null;
+
+    [SerializeField] 
+    float noTouchTimer = 5f;
 
     float timer = 0f;
     bool timerOn = false;

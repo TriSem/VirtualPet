@@ -2,11 +2,20 @@
 
 public class SleepController : MonoBehaviour
 {
-    [SerializeField] float maxTiredness = 100f;
-    [SerializeField] float buildUpRate = 1f;
-    [SerializeField] float recoveryRate = 1f;
-    [SerializeField] float avoidSleepBelow = 20f;
-    [SerializeField] PetAgent agent = null;
+    [SerializeField] 
+    float maxTiredness = 100f;
+
+    [SerializeField] 
+    float buildUpRate = 1f;
+
+    [SerializeField] 
+    float recoveryRate = 1f;
+
+    [SerializeField] 
+    float avoidSleepBelow = 20f;
+
+    [SerializeField] 
+    PetAgent agent = null;
 
     float tiredness = 0f;
 

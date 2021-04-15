@@ -2,16 +2,23 @@
 
 public class HungerController : MonoBehaviour
 {
-    [SerializeField] float satedRatio = 1f;
-    [SerializeField] float peckishRatio = 0.5f;
-    [SerializeField] float starvingRatio = 0f;
+    [SerializeField, Range(0.01f, 1f)] 
+    float satedRatio = 1f;
+
+    [SerializeField, Range(0.01f, 1f)] 
+    float peckishRatio = 0.5f;
+
+    [SerializeField, Range(0.01f, 1f)] 
+    float starvingRatio = 0f;
+
     [SerializeField, Range(1f, 1000f)]
     float maxFill = 100f;
 
     [SerializeField, Range(0f, 1000f)]
     float decayPerSecond = 0.5f;
 
-    [SerializeField] PetAgent agent = null;
+    [SerializeField] 
+    PetAgent agent = null;
 
 
     float currentFill = 0f;
@@ -25,7 +32,7 @@ public class HungerController : MonoBehaviour
         float driveValue;
         if (FillRatio <= starvingRatio)
             driveValue = 2f;
-        if (FillRatio <= peckishRatio)
+        else if (FillRatio <= peckishRatio)
             driveValue = 1f;
         else if (FillRatio >= satedRatio)
             driveValue = -1f;

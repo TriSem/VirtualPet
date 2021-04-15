@@ -96,7 +96,7 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void StartLearning(string behaviorName)
     {
-        if (nextLearningAvailable >= Time.time)
+        if (Time.time > nextLearningAvailable)
         {
             icon.gameObject.SetActive(true);
             currentlyLearning = learnableBehaviors[behaviorName];

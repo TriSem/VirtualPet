@@ -4,10 +4,17 @@ using UnityEngine;
 
 public class BehaviourSelection : MonoBehaviour
 {
-    [SerializeField] PetAgent agent = default;
-    [SerializeField] Transform internalBehaviorSet = default;
-    [SerializeField] Behavior fallbackBehavior = default;
-    [SerializeField] float commandBonus = default;
+    [SerializeField] 
+    PetAgent agent = default;
+
+    [SerializeField] 
+    Transform internalBehaviorSet = default;
+
+    [SerializeField] 
+    Behavior fallbackBehavior = default;
+
+    [SerializeField] 
+    float commandBonus = default;
 
     HashSet<string> commandedBehaviors = new HashSet<string>();
     Dictionary<string, float> behaviorBoni = new Dictionary<string, float>();

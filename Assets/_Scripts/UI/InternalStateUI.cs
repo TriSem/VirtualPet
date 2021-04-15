@@ -5,7 +5,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class InternalStateUI : MonoBehaviour
 {
-    [SerializeField] PetAgent agent = null;
+    [SerializeField] 
+    PetAgent agent = null;
+
     Text text;
     StringBuilder builder = new StringBuilder();
 

@@ -5,10 +5,14 @@ public class EatTreat : Behavior, IPhysicsObject
     [SerializeField, Range(0f, 1000f)] 
     float fillValue = 5f;
 
-    [SerializeField] float timeToChew = 2f;
+    [SerializeField] 
+    float timeToChew = 2f;
 
-    [SerializeField] Interaction interaction = default;
-    [SerializeField] Material highlightMaterial = default;
+    [SerializeField] 
+    Interaction interaction = default;
+
+    [SerializeField] 
+    Material highlightMaterial = default;
 
     new Rigidbody rigidbody;
     new Collider collider;

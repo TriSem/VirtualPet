@@ -3,9 +3,14 @@
 // Lets the player spawn treats in their hand.
 public class DispenseTreat : MonoBehaviour
 {
-    [SerializeField] Transform treatPrefab = default;
-    [SerializeField] Transform cursor = default;
-    [SerializeField] ObjectSelection objectSelection = null;
+    [SerializeField] 
+    Transform treatPrefab = default;
+
+    [SerializeField] 
+    Transform cursor = default;
+
+    [SerializeField] 
+    ObjectSelection objectSelection = null;
 
     void Update()
     {

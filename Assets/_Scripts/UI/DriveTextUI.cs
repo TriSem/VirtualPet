@@ -4,8 +4,12 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class DriveTextUI : MonoBehaviour
 {
-    [SerializeField] Drive drive = default;
-    [SerializeField] PetAgent agent = default;
+    [SerializeField] 
+    Drive drive = default;
+
+    [SerializeField] 
+    PetAgent agent = default;
+
     Text text = default;
     string baseString = default;
 

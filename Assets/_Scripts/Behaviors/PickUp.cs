@@ -4,7 +4,9 @@ using UnityEngine;
 public class PickUp : Behavior, IIntermediary
 {
     PetStateMachine stateMachine = null;
-    [SerializeField] Interaction interaction = null;
+
+    [SerializeField] 
+    Interaction interaction = null;
 
     public override void Cancel()
     {

@@ -4,9 +4,15 @@ using UnityEngine;
 // Component that tracks wether the pet is being touched or not.
 public class Touch : MonoBehaviour
 {
-    [SerializeField] float tickRate = 0.2f;
-    [SerializeField] List<TouchReceptor> touchReceptors = null;
-    [SerializeField] PetAgent agent = null;
+    [SerializeField] 
+    float tickRate = 0.2f;
+
+    [SerializeField] 
+    List<TouchReceptor> touchReceptors = null;
+
+    [SerializeField] 
+    PetAgent agent = null;
+
     float nextTick = 0f;
 
     void Update()

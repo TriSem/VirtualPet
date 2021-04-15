@@ -8,12 +8,24 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent), typeof(BehaviourSelection))]
 public class PetAgent : MonoBehaviour
 {
-    [SerializeField] float tickRate = 0.5f;
-    [SerializeField] MotorSystem motorSystem = null;
-    [SerializeField] Perception perception = null;
-    [SerializeField] PetGrasp mouth = null;
-    [SerializeField] Learning learning = null;
-    [SerializeField] HungerController hungerController = null;
+    [SerializeField] 
+    float tickRate = 0.5f;
+
+    [SerializeField] 
+    MotorSystem motorSystem = null;
+
+    [SerializeField] 
+    Perception perception = null;
+
+    [SerializeField] 
+    PetGrasp mouth = null;
+
+    [SerializeField] 
+    Learning learning = null;
+
+    [SerializeField] 
+    HungerController hungerController = null;
+
     AudioSource audioSource = null;
 
     public BehaviourSelection BehaviourSelection { get; private set; } = null;

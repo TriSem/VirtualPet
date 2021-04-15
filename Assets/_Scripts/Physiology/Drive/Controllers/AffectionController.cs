@@ -2,13 +2,26 @@
 
 public class AffectionController : MonoBehaviour
 {
-    [SerializeField] PetAgent agent = null;
-    [SerializeField] float buildUprate = 1f;
-    [SerializeField] float reductionRate = 1f;
-    [SerializeField] float maximum = 100f;
-    [SerializeField] float startValue = 100f;
-    [SerializeField] float minimumNeed = -0.5f;
-    [SerializeField] float maximumNeed = 0.5f;
+    [SerializeField] 
+    PetAgent agent = null;
+
+    [SerializeField] 
+    float buildUprate = 1f;
+
+    [SerializeField] 
+    float reductionRate = 1f;
+
+    [SerializeField] 
+    float maximum = 100f;
+
+    [SerializeField]
+    float startValue = 100f;
+
+    [SerializeField] 
+    float minimumNeed = -0.5f;
+
+    [SerializeField] 
+    float maximumNeed = 0.5f;
 
     float currentValue;
 

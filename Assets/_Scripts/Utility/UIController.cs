@@ -2,9 +2,14 @@
 
 public class UIController : MonoBehaviour
 {
-    [SerializeField] GameObject drivePanel = default;
-    [SerializeField] GameObject commandPanel = default;
-    [SerializeField] GameObject statePanel = default;
+    [SerializeField] 
+    GameObject drivePanel = default;
+
+    [SerializeField] 
+    GameObject commandPanel = default;
+
+    [SerializeField] 
+    GameObject statePanel = default;
 
     bool debugHelpOn = false;
 

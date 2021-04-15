@@ -5,12 +5,23 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] float walkSpeed = 3f;
-    [SerializeField] Transform neck = default;
-    [SerializeField] Transform playerCamera = default;
-    [SerializeField] List<CommandMapping> commands = null;
-    [SerializeField] CommandHub commandHub = null;
-    [SerializeField] float commandCooldown = 1f;
+    [SerializeField] 
+    float walkSpeed = 3f;
+
+    [SerializeField] 
+    Transform neck = default;
+
+    [SerializeField] 
+    Transform playerCamera = default;
+
+    [SerializeField] 
+    List<CommandMapping> commands = null;
+
+    [SerializeField] 
+    CommandHub commandHub = null;
+
+    [SerializeField] 
+    float commandCooldown = 1f;
 
     AudioSource audioSource = null;
     Vector3 velocity = default;

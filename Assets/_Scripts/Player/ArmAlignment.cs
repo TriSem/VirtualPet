@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class ArmAlignment : MonoBehaviour
 {
-    [SerializeField] CinemachineVirtualCamera cam = null;
+    [SerializeField] 
+    CinemachineVirtualCamera cam = null;
 
     void LateUpdate()
     {

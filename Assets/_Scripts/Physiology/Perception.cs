@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class Perception : MonoBehaviour
 {
-    [SerializeField] List<Sensor> sensors = null;
+    [SerializeField] 
+    List<Sensor> sensors = null;
 
     public HashSet<WorldObject> Poll()
     {

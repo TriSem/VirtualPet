@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class VisualSensor : Sensor
 {
-    [SerializeField] float visionAngle = 45f;
-    [SerializeField] Light visualization = null;
+    [SerializeField] 
+    float visionAngle = 45f;
+
+    [SerializeField] 
+    Light visualization = null;
 
     public override HashSet<WorldObject> GetPercievedObjects()
     {

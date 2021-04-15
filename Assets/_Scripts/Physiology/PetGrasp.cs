@@ -3,7 +3,8 @@
 // Lets the pet carry world objects.
 public class PetGrasp : MonoBehaviour
 {
-    [SerializeField] PetAgent agent = null;
+    [SerializeField] 
+    PetAgent agent = null;
     Behavior carried = null;
 
     public bool Carrying => carried != null;

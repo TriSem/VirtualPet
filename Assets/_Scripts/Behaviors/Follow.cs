@@ -14,8 +14,4 @@
         Status = BehaviorState.Ongoing;
         agent.Motor.Follow(transform);
     }
-
-    void Update()
-    {
-    }
 }

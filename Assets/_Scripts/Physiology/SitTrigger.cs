@@ -2,9 +2,14 @@
 
 public class SitTrigger : MonoBehaviour
 {
-    [SerializeField] string tagName = default;
-    [SerializeField] PetAgent agent = null;
-    [SerializeField] float duration = 2f;
+    [SerializeField] 
+    string tagName = default;
+
+    [SerializeField] 
+    PetAgent agent = null;
+
+    [SerializeField] 
+    float duration = 2f;
 
     float removeBonusTime = 0f;
 
@@ -28,13 +33,4 @@ public class SitTrigger : MonoBehaviour
             agent.BehaviourSelection.RemoveBonus("Sit");
         }
     }
-
-    //void OnTriggerExit(Collider other)
-    //{
-    //    if (other.CompareTag(tagName))
-    //    {
-    //        Triggered = false;
-    //        agent.BehaviourSelection.RemoveBonus("Sit");
-    //    }
-    //}
 }

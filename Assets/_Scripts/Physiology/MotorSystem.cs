@@ -3,14 +3,29 @@ using UnityEngine.AI;
 
 public class MotorSystem : MonoBehaviour
 {
-    [SerializeField] NavMeshAgent navAgent = null;
-    [SerializeField] Animator animator = null;
-    [SerializeField] PetAgent agent = null;
-    [SerializeField] float baseSpeed = 3f;
-    [SerializeField] float maximumSpeed = 6f;
-    [SerializeField] float baseAngularSpeed = 135f;
-    [SerializeField] float maximumAngularSpeed = 270f;
-    [SerializeField] float baseStoppingDistance = 2f;
+    [SerializeField] 
+    NavMeshAgent navAgent = null;
+
+    [SerializeField] 
+    Animator animator = null;
+
+    [SerializeField] 
+    PetAgent agent = null;
+
+    [SerializeField] 
+    float baseSpeed = 3f;
+
+    [SerializeField] 
+    float maximumSpeed = 6f;
+
+    [SerializeField] 
+    float baseAngularSpeed = 135f;
+
+    [SerializeField] 
+    float maximumAngularSpeed = 270f;
+
+    [SerializeField] 
+    float baseStoppingDistance = 2f;
 
     bool stopped = true;
 

@@ -3,7 +3,8 @@
 // Lets the player kick around objects by walking into them.
 public class Kick : MonoBehaviour
 {
-    [SerializeField] float strength = 1f;
+    [SerializeField] 
+    float strength = 1f;
 
     void OnTriggerEnter(Collider other)
     { 
