@@ -90,6 +90,9 @@ public class Transition
     public bool Triggered => condition.Met;
 }
 
+
+#region general state definitions
+
 public class ExitState : PetState
 {
     public override void OnEntry(PetAgent agent, Behavior behavior)
@@ -153,3 +156,5 @@ public class DropState : PetState
         agent.Mouth.Release();
     }
 }
+
+#endregion

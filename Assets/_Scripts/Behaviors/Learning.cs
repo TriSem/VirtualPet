@@ -2,40 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* Enables the pet to associate heard phrases with behaviors.
+ * Learned behaviors will get a bonus to their utility evaluation
+ * when the corresponding command is heard.
+ */
 public class Learning : MonoBehaviour, ICommandReceiver
 {
     [SerializeField, Tooltip("Actions that can be associated with a command.")]
     List<LearnableBehavior> learnables = null;
 
-    [SerializeField] 
+    [SerializeField]
     BehaviourSelection behaviourSelection = null;
 
-    [SerializeField, Tooltip("This will signal that learning is activated.")] 
+    [SerializeField, Tooltip("This will signal that learning is activated.")]
     Transform icon = null;
 
-    [SerializeField] 
+    [SerializeField]
     CommandHub commandHub = null;
 
     [SerializeField, Tooltip("Determines how many seconds the command bonus will last.")]
     float commandDuration = 3;
 
-    [SerializeField] 
+    [SerializeField]
     float learningCooldown = 5f;
 
-    [SerializeField] 
+    [SerializeField]
     Material commandHeardMaterial = null;
 
+    readonly Dictionary<string, LearnableBehavior> learnableBehaviors = new Dictionary<string, LearnableBehavior>();
+    readonly List<Tuple<LearnableBehavior, float>> recentlyHeard = new List<Tuple<LearnableBehavior, float>>();
     Material originalMaterial;
     MeshRenderer iconRenderer;
- 
-    Dictionary<string, LearnableBehavior> learnableBehaviors = new Dictionary<string, LearnableBehavior>();
-    List<Tuple<LearnableBehavior, float>> recentlyHeard = new List<Tuple<LearnableBehavior, float>>();
     LearnableBehavior currentlyLearning = null;
     float nextLearningAvailable = 0f;
 
     void Awake()
     {
-        foreach(var learnable in learnables)
+        foreach (var learnable in learnables)
         {
             learnableBehaviors.Add(learnable.Name, learnable);
         }
@@ -67,12 +70,12 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void PhraseHeard(string phrase)
     {
-        Debug.Log("Heard: " + phrase);
+        // If a command can be learned, add the phrase to its statistic.
         if (currentlyLearning != null)
         {
             var action = learnableBehaviors[currentlyLearning.Name];
             iconRenderer.material = commandHeardMaterial;
-            
+
             action.PhraseRecognized(phrase);
         }
         else
@@ -86,7 +89,6 @@ public class Learning : MonoBehaviour, ICommandReceiver
                 {
                     recentlyHeard.Add(new Tuple<LearnableBehavior, float>(entry.Value, Time.time + commandDuration));
                     behaviourSelection.StartCommanding(entry.Value.Name);
-                    Debug.Log("Start Commanding: " + entry.Value.Name);
                 }
             }
         }
@@ -94,21 +96,18 @@ public class Learning : MonoBehaviour, ICommandReceiver
 
     public void StartLearning(string behaviorName)
     {
-        if (nextLearningAvailable >= Time.time) ;
+        if (nextLearningAvailable >= Time.time)
         {
-            Debug.Log("Start learning: " + behaviorName);
             icon.gameObject.SetActive(true);
             currentlyLearning = learnableBehaviors[behaviorName];
             nextLearningAvailable = Time.time + learningCooldown;
         }
-        Debug.Log("Learning not available");
     }
 
     public void StopLearning(string behaviorName)
     {
-        if(currentlyLearning != null && currentlyLearning.Name == behaviorName)
+        if (currentlyLearning != null && currentlyLearning.Name == behaviorName)
         {
-            Debug.Log("Stop learning: " + behaviorName);
             icon.gameObject.SetActive(false);
             currentlyLearning = null;
             iconRenderer.material = originalMaterial;
@@ -118,6 +117,17 @@ public class Learning : MonoBehaviour, ICommandReceiver
     public void RecieveCommand(string command)
     {
         PhraseHeard(command);
+    }
+
+    public bool HasHeardCommand(string commandName)
+    {
+        foreach(var tuple in recentlyHeard)
+        {
+            if (tuple.Item1.Name == commandName)
+                return true;
+        }
+
+        return false;
     }
 }
 

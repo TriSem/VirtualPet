@@ -33,7 +33,6 @@ public class PetGrasp : MonoBehaviour
             physicsObject.Collider.enabled = true;
         }
 
-        Debug.Log("Release");
         agent.InternalModel.Remove(InternalState.Carrying);
         carried.transform.parent = null;
         carried = null;

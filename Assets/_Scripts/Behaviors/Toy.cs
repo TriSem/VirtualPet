@@ -56,7 +56,6 @@ public class PlayAndWander : PetState
     {
         agent.Motor.Stop();
         agent.Motor.StopWaggingTail();
-        agent.Mouth.Release();
     }
 
     public override void OnUpdate(PetAgent agent, Behavior behavior)

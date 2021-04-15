@@ -20,6 +20,7 @@
         Status = BehaviorState.Ongoing;
         this.agent = agent;
         agent.Motor.LieDown();
+        agent.Mouth.Release();
         agent.InternalModel.Add(InternalState.Sleeping);
         agent.InternalModel.Add(InternalState.LyingDown);
     }

@@ -6,6 +6,8 @@ public interface ICondition
     bool Met { get; }
 }
 
+#region condition definitions
+
 public class AndCondition : ICondition
 {
     ICondition condition1, condition2;
@@ -92,3 +94,20 @@ public class MetCondition : ICondition
 {
     public bool Met => true;
 }
+
+public class InternalStateCondition : ICondition
+{
+    readonly InternalModel model;
+    readonly InternalState requiredState;
+
+    public InternalStateCondition(InternalModel model, InternalState requiredState)
+    {
+        this.model = model;
+        this.requiredState = requiredState;
+    }
+
+    public bool Met => model.Contains(requiredState);
+}
+
+
+#endregion

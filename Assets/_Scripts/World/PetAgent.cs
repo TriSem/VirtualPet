@@ -2,6 +2,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+/* Core of the AI. Selects behaviors at
+ * specified intervals.
+ */
 [RequireComponent(typeof(NavMeshAgent), typeof(BehaviourSelection))]
 public class PetAgent : MonoBehaviour
 {
@@ -10,8 +13,7 @@ public class PetAgent : MonoBehaviour
     [SerializeField] Perception perception = null;
     [SerializeField] PetGrasp mouth = null;
     [SerializeField] Learning learning = null;
-    [SerializeField] HungerController hungerController;
-    [SerializeField] Touch touch = null;
+    [SerializeField] HungerController hungerController = null;
     AudioSource audioSource = null;
 
     public BehaviourSelection BehaviourSelection { get; private set; } = null;
